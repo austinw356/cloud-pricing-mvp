@@ -8,21 +8,18 @@ index.html
     body {
       font-family: Arial, sans-serif;
       margin: 40px auto;
-      max-width: 900px;
+      max-width: 1000px;
       background: #f4f4f4;
       padding: 20px;
     }
-
     h1 {
       margin-bottom: 8px;
     }
-
     .disclaimer {
       font-size: 0.9em;
       color: #555;
       margin-bottom: 20px;
     }
-
     .card {
       background: #fff;
       border: 1px solid #ddd;
@@ -30,14 +27,12 @@ index.html
       padding: 20px;
       margin-bottom: 20px;
     }
-
     .card h2 {
       margin-top: 0;
       margin-bottom: 20px;
       font-size: 1.2em;
       color: #333;
     }
-
     .field {
       margin-bottom: 16px;
     }
@@ -47,12 +42,10 @@ index.html
       font-weight: bold;
       margin-bottom: 6px;
     }
-
     select, input[type="number"] {
       min-width: 150px;
       padding: 4px;
     }
-
     button {
       margin-top: 8px;
       padding: 6px 12px;
@@ -65,12 +58,10 @@ index.html
     button:hover {
       background: #0056b3;
     }
-
     .disabled {
       background-color: #ccc !important;
       cursor: not-allowed;
     }
-
     table {
       width: 100%;
       border-collapse: collapse;
@@ -91,7 +82,6 @@ index.html
     td button:hover {
       background: #a71d2a;
     }
-
     .totals-section {
       margin-top: 20px;
       background: #fff;
@@ -99,10 +89,13 @@ index.html
       border-radius: 5px;
       padding: 16px;
     }
+    .totals-section h3 {
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
     .totals-section p {
       margin: 0;
       padding: 4px 0;
-      font-weight: bold;
     }
     .totals-section p span {
       float: right;
@@ -119,88 +112,105 @@ index.html
   <div class="card">
     <h2>Add a New Resource</h2>
 
-    <!-- Only one resource type: Virtual Machines -->
+    <!-- Resource Type: VM or Object Storage -->
     <div class="field">
-      <label>Resource Type:</label>
-      <select id="resourceType" disabled>
+      <label for="resourceType">Resource Type:</label>
+      <select id="resourceType">
         <option value="VM" selected>Virtual Machines</option>
+        <option value="ObjectStorage">Object Storage</option>
       </select>
     </div>
 
-    <!-- Performance Class -->
-    <div class="field">
-      <label for="perfClass">Performance Class:</label>
-      <select id="perfClass">
-        <option value="BV">Balanced Value (BV)</option>
-        <option value="DP">Dedicated Performance (DP)</option>
-      </select>
+    <!-- =============== VIRTUAL MACHINE FIELDS =============== -->
+    <div id="vmFields">
+      <!-- Performance Class -->
+      <div class="field">
+        <label for="perfClass">Performance Class:</label>
+        <select id="perfClass">
+          <option value="BV">Balanced Value (BV)</option>
+          <option value="DP">Dedicated Performance (DP)</option>
+        </select>
+      </div>
+
+      <!-- OS Type -->
+      <div class="field">
+        <label for="osType">OS Type:</label>
+        <select id="osType">
+          <option value="Linux">Linux</option>
+          <option value="Windows">Windows (+R$150/vCPU)</option>
+        </select>
+      </div>
+
+      <!-- Memory Ratio -->
+      <div class="field">
+        <label for="memoryRatio">Memory Ratio (RAM / vCPU):</label>
+        <select id="memoryRatio">
+          <!-- Will update dynamically -->
+        </select>
+      </div>
+
+      <!-- vCPUs -->
+      <div class="field">
+        <label for="vcpus">VM Size (# of vCPUs):</label>
+        <select id="vcpus">
+          <!-- Will update dynamically -->
+        </select>
+      </div>
+
+      <!-- Local Disk -->
+      <div class="field">
+        <label for="localDisk">Local Disk Size (GiB):</label>
+        <select id="localDisk">
+          <!-- Will update dynamically -->
+        </select>
+      </div>
+
+      <!-- GPU -->
+      <div class="field">
+        <label for="gpu">Optional GPU:</label>
+        <select id="gpu">
+          <option value="0">No GPU</option>
+          <option value="1">1x Nvidia L40 (+R$5110)</option>
+          <option value="2">2x Nvidia L40 (+R$10220)</option>
+        </select>
+        <span id="gpuNote" style="color: #d00; margin-left: 10px;"></span>
+      </div>
     </div>
 
-    <!-- OS Type (moved above Memory Ratio) -->
-    <div class="field">
-      <label for="osType">OS Type:</label>
-      <select id="osType">
-        <option value="Linux">Linux</option>
-        <option value="Windows">Windows (+R$150/vCPU)</option>
-      </select>
+    <!-- =============== OBJECT STORAGE FIELDS =============== -->
+    <div id="storageFields" style="display: none;">
+      <div class="field">
+        <label for="storageClass">Storage Class:</label>
+        <select id="storageClass">
+          <option value="Standard" selected>Standard (R$0.10/GB)</option>
+          <option value="ColdInstant">Cold Instant (R$0.06/GB + R$0.10/GB retrieval)</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="storageGiB"># of GiBs Stored:</label>
+        <input type="number" id="storageGiB" value="500" min="1" />
+      </div>
+      <div class="field">
+        <label for="retrievedGiB">GiBs Retrieved per Month:</label>
+        <input type="number" id="retrievedGiB" value="100" min="0" />
+      </div>
     </div>
 
-    <!-- Memory Ratio -->
-    <div class="field">
-      <label for="memoryRatio">Memory Ratio (RAM / vCPU):</label>
-      <select id="memoryRatio">
-        <!-- Will update dynamically for BV or DP -->
-      </select>
-    </div>
-
-    <!-- vCPUs -->
-    <div class="field">
-      <label for="vcpus">VM Size (# of vCPUs):</label>
-      <select id="vcpus">
-        <!-- Will update dynamically for BV or DP -->
-      </select>
-    </div>
-
-    <!-- Local Disk -->
-    <div class="field">
-      <label for="localDisk">Local Disk Size (GiB):</label>
-      <select id="localDisk">
-        <!-- Will update dynamically -->
-      </select>
-    </div>
-
-    <!-- GPU -->
-    <div class="field">
-      <label for="gpu">Optional GPU:</label>
-      <select id="gpu">
-        <option value="0">No GPU</option>
-        <option value="1">1x Nvidia L40 (+R$5110)</option>
-        <option value="2">2x Nvidia L40 (+R$10220)</option>
-      </select>
-      <span id="gpuNote" style="color: #d00; margin-left: 10px;"></span>
-    </div>
-
-    <!-- Quantity -->
+    <!-- Shared quantity field (applies to both VM and Storage) -->
     <div class="field">
       <label for="quantity">Quantity of Instances:</label>
       <input type="number" id="quantity" value="1" min="1" />
     </div>
 
-    <!-- Button to add instance -->
-    <button id="addInstanceBtn">Add This Configuration</button>
+    <button id="addResourceBtn">Add This Configuration</button>
   </div>
 
-  <!-- Table listing the chosen instances -->
+  <!-- =============== TABLE OF ADDED RESOURCES =============== -->
   <table id="instancesTable">
     <thead>
       <tr>
-        <th>SKU</th>
-        <th>Perf Class</th>
-        <th>vCPUs</th>
-        <th>RAM (GB)</th>
-        <th>OS</th>
-        <th>Disk (GiB)</th>
-        <th>GPU(s)</th>
+        <th>Resource Type</th>
+        <th>SKU / Details</th>
         <th>Qty</th>
         <th>Subtotal (R$)</th>
         <th>Remove</th>
@@ -211,25 +221,39 @@ index.html
     </tbody>
   </table>
 
-  <div class="totals-section">
-    <!-- Subtotal for VMs (and later other resource types) -->
-    <p>Virtual Machines: <span id="vmSubtotal">R$0.00</span></p>
-    <p>Total Monthly Cost: <span id="totalMonthlyCost">R$0.00</span></p>
+  <!-- =============== SUMMARY / TOTALS SECTION =============== -->
+  <div class="totals-section" id="totalsSection">
+    <h3>Summary</h3>
+
+    <!-- VMs -->
+    <p>**Virtual Machines**</p>
+    <p>Total vCPUs: <span id="vmTotalVcpus">0</span></p>
+    <p>Total RAM (GB): <span id="vmTotalRam">0</span></p>
+    <p>Total VM Cost: <span id="vmTotalCost">R$0.00</span></p>
+
+    <!-- Object Storage -->
+    <br />
+    <p>**Object Storage**</p>
+    <p>Total GB Stored: <span id="storageTotalGiB">0</span></p>
+    <p>Total GB Retrieved: <span id="storageTotalRetrieved">0</span></p>
+    <p>Total Storage Cost: <span id="storageTotalCost">R$0.00</span></p>
+
+    <br />
+    <p><strong>Total Monthly Cost:</strong> <span id="grandTotalCost">R$0.00</span></p>
   </div>
 
   <script>
-    // --------------------------------------------------------
-    // 1) Data Definitions
-    // --------------------------------------------------------
+    // ----------------------------------------------------------------
+    // A) Data & Pricing
+    // ----------------------------------------------------------------
 
     // Balanced Value (BV) or Dedicated Performance (DP)
     const memoryRatiosBV = [1, 2, 4];
     const memoryRatiosDP = [2, 4, 8];
-
     const vcpusBV = [1, 2, 4, 8];
     const vcpusDP = [2, 4, 8, 16, 32];
 
-    // Local disk options by combination (in GiB):
+    // Local disk options:
     // BV + Linux => [10, 20, 40, 100]
     // BV + Windows => [40, 80, 160]
     // DP (Linux or Windows) => [100, 150, 250]
@@ -238,33 +262,77 @@ index.html
         if (os === 'Linux') {
           return [10, 20, 40, 100];
         } else {
-          // Windows
           return [40, 80, 160];
         }
       } else {
-        // DP (both OS)
+        // DP
         return [100, 150, 250];
       }
     }
 
-    // HTML elements
-    const perfClassEl = document.getElementById('perfClass');
-    const osTypeEl = document.getElementById('osType');
-    const memoryRatioEl = document.getElementById('memoryRatio');
-    const vcpusEl = document.getElementById('vcpus');
-    const localDiskEl = document.getElementById('localDisk');
-    const gpuEl = document.getElementById('gpu');
-    const gpuNoteEl = document.getElementById('gpuNote');
-    const quantityEl = document.getElementById('quantity');
+    // ----------------------------------------------------------------
+    // B) DOM Elements
+    // ----------------------------------------------------------------
+    const resourceTypeEl  = document.getElementById('resourceType');
 
-    // --------------------------------------------------------
-    // 2) Update Form Fields Dynamically
-    // --------------------------------------------------------
-    function updateForm() {
+    // VM fields
+    const vmFieldsEl      = document.getElementById('vmFields');
+    const perfClassEl     = document.getElementById('perfClass');
+    const osTypeEl        = document.getElementById('osType');
+    const memoryRatioEl   = document.getElementById('memoryRatio');
+    const vcpusEl         = document.getElementById('vcpus');
+    const localDiskEl     = document.getElementById('localDisk');
+    const gpuEl           = document.getElementById('gpu');
+    const gpuNoteEl       = document.getElementById('gpuNote');
+
+    // Object Storage fields
+    const storageFieldsEl = document.getElementById('storageFields');
+    const storageClassEl  = document.getElementById('storageClass');
+    const storageGiBEl    = document.getElementById('storageGiB');
+    const retrievedGiBEl  = document.getElementById('retrievedGiB');
+
+    // Shared
+    const quantityEl      = document.getElementById('quantity');
+    const addResourceBtn  = document.getElementById('addResourceBtn');
+    const instancesTableBody = document.querySelector('#instancesTable tbody');
+
+    // Totals section
+    const vmTotalVcpusEl  = document.getElementById('vmTotalVcpus');
+    const vmTotalRamEl    = document.getElementById('vmTotalRam');
+    const vmTotalCostEl   = document.getElementById('vmTotalCost');
+    const storageTotalGiBEl = document.getElementById('storageTotalGiB');
+    const storageTotalRetrievedEl = document.getElementById('storageTotalRetrieved');
+    const storageTotalCostEl = document.getElementById('storageTotalCost');
+    const grandTotalCostEl = document.getElementById('grandTotalCost');
+
+    // Data store for all added resources
+    let instances = [];
+
+    // ----------------------------------------------------------------
+    // C) Show/Hide fields based on Resource Type
+    // ----------------------------------------------------------------
+    function updateResourceTypeUI() {
+      const selectedType = resourceTypeEl.value;
+
+      if (selectedType === 'VM') {
+        vmFieldsEl.style.display = 'block';
+        storageFieldsEl.style.display = 'none';
+      } else {
+        vmFieldsEl.style.display = 'none';
+        storageFieldsEl.style.display = 'block';
+      }
+    }
+
+    resourceTypeEl.addEventListener('change', updateResourceTypeUI);
+
+    // ----------------------------------------------------------------
+    // D) VM Form Field Updates
+    // ----------------------------------------------------------------
+    function updateVMFields() {
       const currentPerfClass = perfClassEl.value;
       const currentOS = osTypeEl.value;
 
-      // Memory ratios
+      // Memory Ratios
       let ratios = (currentPerfClass === 'BV') ? memoryRatiosBV : memoryRatiosDP;
       memoryRatioEl.innerHTML = '';
       ratios.forEach(r => {
@@ -284,7 +352,7 @@ index.html
         vcpusEl.appendChild(opt);
       });
 
-      // Local disk
+      // Local Disk
       let diskOpts = getLocalDiskOptions(currentPerfClass, currentOS);
       localDiskEl.innerHTML = '';
       diskOpts.forEach(d => {
@@ -295,9 +363,7 @@ index.html
       });
 
       // GPU logic:
-      // - If perfClass=DP => GPU not available
-      // - If OS=Windows => GPU not available
-      // So we disable the select and show a note accordingly.
+      // disable if DP or OS=Windows
       let disableGPU = false;
       let note = '';
       if (currentPerfClass === 'DP') {
@@ -307,35 +373,50 @@ index.html
         disableGPU = true;
         note = 'GPU not available with Windows';
       }
-
       gpuEl.disabled = disableGPU;
       if (disableGPU) {
-        gpuEl.value = '0'; // reset to no GPU
+        gpuEl.value = '0';
         gpuNoteEl.textContent = note;
       } else {
         gpuNoteEl.textContent = '';
       }
     }
 
-    perfClassEl.addEventListener('change', updateForm);
-    osTypeEl.addEventListener('change', updateForm);
+    perfClassEl.addEventListener('change', updateVMFields);
+    osTypeEl.addEventListener('change', updateVMFields);
 
-    // Initialize
-    updateForm();
+    // also if storageClass changes, hide or show retrieval input
+    storageClassEl.addEventListener('change', () => {
+      if (storageClassEl.value === 'Standard') {
+        // no retrieval fees
+        retrievedGiBEl.disabled = true;
+        retrievedGiBEl.value = 0; 
+      } else {
+        retrievedGiBEl.disabled = false;
+        if (parseInt(retrievedGiBEl.value, 10) === 0) {
+          retrievedGiBEl.value = 100; // default if it was 0
+        }
+      }
+    });
 
-    // --------------------------------------------------------
-    // 3) Pricing Logic
-    // --------------------------------------------------------
-    /*
-      basePrice = 35 for 1 vCPU, memRatio=1, BV, Linux, 0 disk, 0 GPU
-      perfClassFactor = 1 for BV, 1.5 for DP
-      totalComputeCost = basePrice * perfClassFactor * vcpus * memRatio
-      Windows surcharge = 150 * vcpus (if OS=Windows)
-      disk cost = (diskSize / 10) * 8
-      GPU cost = 5110 * numberOfGPUs (only if not disabled)
-      Then multiplied by quantity
-    */
-    function calculateCost(perfClass, memRatio, vcpus, os, diskSize, gpuCount, quantity) {
+    // Init
+    updateResourceTypeUI();
+    updateVMFields();
+
+    // ----------------------------------------------------------------
+    // E) Cost Calculations
+    // ----------------------------------------------------------------
+
+    // VM cost formula:
+    //   basePrice = 35 for 1 vCPU + ratio=1, BV, Linux, zero disk, zero GPU
+    //   perfClassFactor = 1 for BV, 1.5 for DP
+    //   totalCompute = basePrice * perfClassFactor * vcpus * memRatio
+    //   Windows surcharge = 150 * vcpus
+    //   disk cost = (diskSize / 10) * 8
+    //   GPU cost = 5110 * gpus
+    //   => total for 1 instance => sum all above
+    //   => multiply by quantity
+    function calculateVMCost(perfClass, memRatio, vcpus, os, diskSize, gpuCount, quantity) {
       const basePrice = 35;
       const perfClassFactor = (perfClass === 'BV') ? 1 : 1.5;
       const memoryRatioFactor = parseInt(memRatio, 10);
@@ -346,125 +427,134 @@ index.html
 
       // compute cost
       let computeCost = basePrice * perfClassFactor * numVcpus * memoryRatioFactor;
-
-      // Windows surcharge
-      let osSurcharge = 0;
-      if (os === 'Windows') {
-        osSurcharge = 150 * numVcpus;
-      }
-
-      // Disk cost
+      // windows surcharge
+      let osSurcharge = (os === 'Windows') ? 150 * numVcpus : 0;
+      // disk cost => R$8 per 10 GiB
       let diskCost = (numDiskGiB / 10) * 8;
+      // gpu cost
+      let gpuCost = 5110 * gpus;
 
-      // GPU cost
-      let gpuCost = 5110 * gpus; // if GPU is disabled, gpus=0
-
-      // Sum up and then multiply by quantity
       let total = (computeCost + osSurcharge + diskCost + gpuCost) * qty;
       return total;
     }
 
-    // --------------------------------------------------------
-    // 4) Add Instances & Render Table
-    // --------------------------------------------------------
-    const addBtn = document.getElementById('addInstanceBtn');
-    const instancesTableBody = document.querySelector('#instancesTable tbody');
+    // Object Storage cost formula:
+    //   If Standard => cost = R$0.10 * GiBs stored
+    //                  retrieval cost = 0
+    //   If ColdInstant => cost = R$0.06 * GiBs stored
+    //                     retrieval cost = R$0.10 * GiBs retrieved
+    //   Multiply total by quantity
+    function calculateStorageCost(storageClass, storedGiB, retrievedGiB, quantity) {
+      const qty = parseInt(quantity, 10);
+      const sGiB = parseInt(storedGiB, 10);
+      const rGiB = parseInt(retrievedGiB, 10);
 
-    let instances = []; // each item => { resourceType, sku, perfClass, vcpus, ramGB, os, disk, gpu, quantity, subtotal }
+      let perGbStoragePrice = (storageClass === 'Standard') ? 0.10 : 0.06;
+      let perGbRetrieval = (storageClass === 'Standard') ? 0 : 0.10;
 
-    function addInstance() {
-      const perfClassVal = perfClassEl.value;
-      const osVal = osTypeEl.value;
-      const memRatioVal = memoryRatioEl.value;
-      const vcpusVal = vcpusEl.value;
-      const diskVal = localDiskEl.value;
-      const gpuVal = gpuEl.value;
-      const quantityVal = quantityEl.value;
+      let total = ( (sGiB * perGbStoragePrice) + (rGiB * perGbRetrieval) ) * qty;
+      return total;
+    }
 
-      // Calculate cost
-      const subtotal = calculateCost(
-        perfClassVal,
-        memRatioVal,
-        vcpusVal,
-        osVal,
-        diskVal,
-        gpuVal,
-        quantityVal
-      );
+    // ----------------------------------------------------------------
+    // F) Adding a Resource & Rendering the Table
+    // ----------------------------------------------------------------
+    function addResource() {
+      const rType = resourceTypeEl.value;
+      const qty = parseInt(quantityEl.value, 10);
 
-      // Build a SKU string
-      const ramGB = parseInt(vcpusVal, 10) * parseInt(memRatioVal, 10);
-      const sku = [
-        perfClassVal,
-        vcpusVal + 'vCPU',
-        ramGB + 'GB',
-        osVal,
-        diskVal + 'GiB',
-        gpuVal + 'GPU',
-        'Qty' + quantityVal
-      ].join('-');
+      if (rType === 'VM') {
+        // gather VM fields
+        const perfClassVal = perfClassEl.value;
+        const osVal = osTypeEl.value;
+        const memRatioVal = memoryRatioEl.value;
+        const vcpusVal = vcpusEl.value;
+        const diskVal = localDiskEl.value;
+        const gpuVal = gpuEl.value;
 
-      const instanceItem = {
-        resourceType: 'VM',
-        sku,
-        perfClass: perfClassVal,
-        vcpus: vcpusVal,
-        ramGB,
-        os: osVal,
-        disk: diskVal,
-        gpu: gpuVal,
-        quantity: parseInt(quantityVal, 10),
-        subtotal
-      };
-      instances.push(instanceItem);
+        // cost
+        const subtotal = calculateVMCost(
+          perfClassVal, memRatioVal, vcpusVal, osVal, diskVal, gpuVal, qty
+        );
 
-      // Re-render the table
+        // details
+        const ramGB = parseInt(vcpusVal, 10) * parseInt(memRatioVal, 10);
+        const sku = [
+          'VM',
+          perfClassVal,
+          vcpusVal + 'vCPU',
+          ramGB + 'GB',
+          osVal,
+          diskVal + 'GiB',
+          gpuVal + 'GPU',
+        ].join('-');
+
+        instances.push({
+          resourceType: 'VM',
+          sku,
+          perfClass: perfClassVal,
+          vcpus: parseInt(vcpusVal, 10),
+          ramGB,
+          os: osVal,
+          disk: parseInt(diskVal, 10),
+          gpu: parseInt(gpuVal, 10),
+          quantity: qty,
+          cost: subtotal
+        });
+
+      } else {
+        // gather Storage fields
+        const sClass = storageClassEl.value;
+        const sGiB = parseInt(storageGiBEl.value, 10);
+        let rGiB = parseInt(retrievedGiBEl.value, 10);
+        // if Standard is selected, retrieval is 0
+        if (sClass === 'Standard') {
+          rGiB = 0;
+        }
+
+        const subtotal = calculateStorageCost(sClass, sGiB, rGiB, qty);
+        const sku = [
+          'ObjectStorage',
+          sClass,
+          sGiB + 'GB',
+          (sClass === 'ColdInstant' ? rGiB + 'GBRetrieved' : 'NoRetrieval'),
+        ].join('-');
+
+        instances.push({
+          resourceType: 'ObjectStorage',
+          sku,
+          storageClass: sClass,
+          storedGiB: sGiB,
+          retrievedGiB: rGiB,
+          quantity: qty,
+          cost: subtotal
+        });
+      }
+
       renderTable();
     }
 
     function renderTable() {
+      // clear existing rows
       instancesTableBody.innerHTML = '';
 
-      let vmSum = 0;
+      let vmTotalCost = 0, vmTotalVcpus = 0, vmTotalRam = 0;
+      let storageTotalCost = 0, storageTotalGiB = 0, storageTotalRetrieved = 0;
       let grandTotal = 0;
 
       instances.forEach((inst, idx) => {
+        // create a row
         const tr = document.createElement('tr');
+
+        // Resource Type
+        const typeTd = document.createElement('td');
+        typeTd.textContent = inst.resourceType;
+        tr.appendChild(typeTd);
 
         // SKU
         const skuTd = document.createElement('td');
         skuTd.textContent = inst.sku;
         tr.appendChild(skuTd);
-
-        // PerfClass
-        const perfTd = document.createElement('td');
-        perfTd.textContent = inst.perfClass;
-        tr.appendChild(perfTd);
-
-        // vCPUs
-        const vcpusTd = document.createElement('td');
-        vcpusTd.textContent = inst.vcpus;
-        tr.appendChild(vcpusTd);
-
-        // RAM
-        const ramTd = document.createElement('td');
-        ramTd.textContent = inst.ramGB;
-        tr.appendChild(ramTd);
-
-        // OS
-        const osTd = document.createElement('td');
-        osTd.textContent = inst.os;
-        tr.appendChild(osTd);
-
-        // Disk
-        const diskTd = document.createElement('td');
-        diskTd.textContent = inst.disk;
-        tr.appendChild(diskTd);
-
-        // GPU
-        const gpuTd = document.createElement('td');
-        gpuTd.textContent = inst.gpu;
-        tr.appendChild(gpuTd);
 
         // Quantity
         const qtyTd = document.createElement('td');
@@ -472,9 +562,9 @@ index.html
         tr.appendChild(qtyTd);
 
         // Subtotal
-        const subtotalTd = document.createElement('td');
-        subtotalTd.textContent = 'R$' + inst.subtotal.toFixed(2);
-        tr.appendChild(subtotalTd);
+        const costTd = document.createElement('td');
+        costTd.textContent = 'R$' + inst.cost.toFixed(2);
+        tr.appendChild(costTd);
 
         // Remove button
         const removeTd = document.createElement('td');
@@ -489,19 +579,35 @@ index.html
 
         instancesTableBody.appendChild(tr);
 
-        // Summation
-        grandTotal += inst.subtotal;
+        // Now accumulate totals
+        grandTotal += inst.cost;
+
         if (inst.resourceType === 'VM') {
-          vmSum += inst.subtotal;
+          vmTotalCost += inst.cost;
+          vmTotalVcpus += (inst.vcpus * inst.quantity);
+          vmTotalRam += (inst.ramGB * inst.quantity);
+        } else if (inst.resourceType === 'ObjectStorage') {
+          storageTotalCost += inst.cost;
+          storageTotalGiB += (inst.storedGiB * inst.quantity);
+          if (inst.storageClass === 'ColdInstant') {
+            storageTotalRetrieved += (inst.retrievedGiB * inst.quantity);
+          }
         }
       });
 
-      // Update sub-totals and total cost
-      document.getElementById('vmSubtotal').textContent = 'R$' + vmSum.toFixed(2);
-      document.getElementById('totalMonthlyCost').textContent = 'R$' + grandTotal.toFixed(2);
+      // Update summary
+      vmTotalVcpusEl.textContent = vmTotalVcpus;
+      vmTotalRamEl.textContent = vmTotalRam;
+      vmTotalCostEl.textContent = 'R$' + vmTotalCost.toFixed(2);
+
+      storageTotalGiBEl.textContent = storageTotalGiB;
+      storageTotalRetrievedEl.textContent = storageTotalRetrieved;
+      storageTotalCostEl.textContent = 'R$' + storageTotalCost.toFixed(2);
+
+      grandTotalCostEl.textContent = 'R$' + grandTotal.toFixed(2);
     }
 
-    addBtn.addEventListener('click', addInstance);
+    addResourceBtn.addEventListener('click', addResource);
 
   </script>
 </body>
