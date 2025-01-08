@@ -1,9 +1,4 @@
 <!DOCTYPE html>
-
-cloud-pricing-mvp (the repository)
-|
-└── index.html
-
 <html>
 <head>
   <meta charset="utf-8" />
@@ -12,74 +7,264 @@ cloud-pricing-mvp (the repository)
     body {
       font-family: Arial, sans-serif;
       margin: 40px;
+      max-width: 700px;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    .field {
+      margin-bottom: 12px;
     }
     label {
       display: inline-block;
-      width: 180px;
-      margin-bottom: 8px;
+      width: 200px;
+      margin-bottom: 4px;
     }
-    input, select {
-      margin-bottom: 8px;
+    select, input {
+      width: 200px;
+      padding: 4px;
+      margin-bottom: 4px;
     }
-    .field {
-      margin-bottom: 16px;
+    button {
+      margin-top: 8px;
+      padding: 6px 10px;
+      cursor: pointer;
     }
-    .button {
-      margin-bottom: 20px;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 16px;
     }
-    #totalCost {
+    th, td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: center;
+    }
+    th {
+      background: #f4f4f4;
+    }
+    #grandTotal {
+      font-size: 1.2em;
       font-weight: bold;
-      color: #2c3e50;
+      margin-top: 16px;
     }
   </style>
 </head>
 <body>
   <h1>Cloud Resource Pricing Calculator (MVP)</h1>
 
-  <!-- Resource Type -->
+  <!-- Resource Type (Only one option: Virtual Machines) -->
   <div class="field">
-    <label for="resource">Select Resource Type:</label>
-    <select id="resource">
-      <!-- Hard-coded hourly rates for demonstration -->
-      <option value="0.50">Small (R$0.50/hour)</option>
-      <option value="1.00">Medium (R$1.00/hour)</option>
-      <option value="2.00">Large (R$2.00/hour)</option>
+    <label>Resource Type:</label>
+    <select id="resourceType">
+      <option value="vm" selected>Virtual Machines</option>
     </select>
   </div>
 
-  <!-- Usage Hours -->
+  <!-- Performance Class -->
   <div class="field">
-    <label for="hours">Usage Hours per Month:</label>
-    <input type="number" id="hours" value="720" />
+    <label for="performanceClass">Performance Class:</label>
+    <select id="performanceClass">
+      <option value="BV" selected>Balanced Value (BV)</option>
+      <option value="DP">Dedicated Performance (DP)</option>
+    </select>
+  </div>
+
+  <!-- Memory Ratio -->
+  <div class="field">
+    <label for="memoryRatio">Memory Ratio (GB per vCPU):</label>
+    <select id="memoryRatio">
+      <!-- This list will update based on performance class -->
+    </select>
+  </div>
+
+  <!-- vCPUs -->
+  <div class="field">
+    <label for="vcpus">vCPUs:</label>
+    <select id="vcpus">
+      <!-- This list will update based on performance class -->
+    </select>
   </div>
 
   <!-- Quantity -->
   <div class="field">
     <label for="quantity">Number of Instances:</label>
-    <input type="number" id="quantity" value="1" />
+    <input type="number" id="quantity" value="1" min="1" />
   </div>
 
-  <!-- Calculate Button -->
-  <div class="field button">
-    <button id="calculateBtn">Calculate</button>
-  </div>
+  <!-- Add button -->
+  <button id="addBtn">Add to Cart</button>
 
-  <!-- Display Result -->
-  <h2>Total Monthly Cost: <span id="totalCost">R$0.00</span></h2>
+  <!-- Cart Table -->
+  <table id="cartTable">
+    <thead>
+      <tr>
+        <th>Performance Class</th>
+        <th>vCPUs</th>
+        <th>Memory Ratio (GB/vCPU)</th>
+        <th>Quantity</th>
+        <th>Monthly Price (Each)</th>
+        <th>Subtotal</th>
+        <th>Remove</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Rows get added dynamically here -->
+    </tbody>
+  </table>
+
+  <!-- Grand Total -->
+  <div id="grandTotal">Grand Total: R$0.00</div>
 
   <script>
-    // A simple click handler for "Calculate" 
-    document.getElementById('calculateBtn').addEventListener('click', function() {
-      const resourceRate = parseFloat(document.getElementById('resource').value);
-      const hours = parseFloat(document.getElementById('hours').value);
-      const quantity = parseFloat(document.getElementById('quantity').value);
+    /************************************************************
+     * 1. Configure Drop-Down Values for BV vs. DP
+     ************************************************************/
+    const memoryRatioOptions = {
+      BV: [1, 2, 4],
+      DP: [2, 4, 8]
+    };
 
-      // Basic calculation: rate * hours * quantity
-      const total = resourceRate * hours * quantity;
+    const vcpuOptions = {
+      BV: [1, 2, 4, 8],
+      DP: [2, 4, 8, 16, 32]
+    };
 
-      // Display total with two decimal places
-      document.getElementById('totalCost').textContent = 'R$' + total.toFixed(2);
-    });
+    // 2. Base Price & Multipliers
+    const BASE_PRICE = 35;       // Price for 1vCPU & 1GB RAM in BV
+    const DP_MULTIPLIER = 1.5;   // Price multiplier for Dedicated Performance
+
+    // 3. "Cart" Data Structure
+    let cartItems = [];
+
+    // DOM Elements
+    const performanceClassSelect = document.getElementById('performanceClass');
+    const memoryRatioSelect      = document.getElementById('memoryRatio');
+    const vcpusSelect            = document.getElementById('vcpus');
+    const quantityInput          = document.getElementById('quantity');
+    const cartTableBody          = document.querySelector('#cartTable tbody');
+    const grandTotalEl           = document.getElementById('grandTotal');
+
+    // Helper: Populate a <select> with numeric options
+    function populateSelect(selectElem, arr) {
+      selectElem.innerHTML = '';
+      arr.forEach(value => {
+        const opt = document.createElement('option');
+        opt.value = value;
+        opt.text = value;
+        selectElem.appendChild(opt);
+      });
+    }
+
+    // Update memory ratio & vCPUs whenever performance class changes
+    function updateDropdowns() {
+      const perfClass = performanceClassSelect.value;
+      populateSelect(memoryRatioSelect, memoryRatioOptions[perfClass]);
+      populateSelect(vcpusSelect, vcpuOptions[perfClass]);
+    }
+
+    // Price Calculation:
+    //  * Base price is R$35 for BV 1vCPU with 1GB
+    //  * Multiply by (#vCPUs * memoryRatio)
+    //  * If DP, add a DP_MULTIPLIER
+    function calculatePrice(perfClass, vcpus, memRatio) {
+      let price = BASE_PRICE * vcpus * memRatio;
+      if (perfClass === 'DP') {
+        price *= DP_MULTIPLIER;
+      }
+      return price;
+    }
+
+    // Add item to cart array and re-render
+    function addToCart() {
+      const perfClass = performanceClassSelect.value;
+      const memRatio = parseInt(memoryRatioSelect.value, 10);
+      const vcpus = parseInt(vcpusSelect.value, 10);
+      const qty = parseInt(quantityInput.value, 10);
+
+      const unitPrice = calculatePrice(perfClass, vcpus, memRatio);
+      const subtotal = unitPrice * qty;
+
+      // Create a cart item object
+      const item = {
+        perfClass,
+        vcpus,
+        memRatio,
+        qty,
+        unitPrice,
+        subtotal
+      };
+
+      cartItems.push(item);
+      renderCart();
+    }
+
+    // Remove item by index
+    function removeCartItem(index) {
+      cartItems.splice(index, 1);
+      renderCart();
+    }
+
+    // Render cart table
+    function renderCart() {
+      cartTableBody.innerHTML = '';
+
+      let grandTotal = 0;
+
+      cartItems.forEach((item, index) => {
+        grandTotal += item.subtotal;
+
+        const row = document.createElement('tr');
+
+        const perfClassTd = document.createElement('td');
+        perfClassTd.textContent = item.perfClass;
+        row.appendChild(perfClassTd);
+
+        const vcpusTd = document.createElement('td');
+        vcpusTd.textContent = item.vcpus;
+        row.appendChild(vcpusTd);
+
+        const memRatioTd = document.createElement('td');
+        memRatioTd.textContent = item.memRatio;
+        row.appendChild(memRatioTd);
+
+        const qtyTd = document.createElement('td');
+        qtyTd.textContent = item.qty;
+        row.appendChild(qtyTd);
+
+        const unitPriceTd = document.createElement('td');
+        unitPriceTd.textContent = 'R$' + item.unitPrice.toFixed(2);
+        row.appendChild(unitPriceTd);
+
+        const subtotalTd = document.createElement('td');
+        subtotalTd.textContent = 'R$' + item.subtotal.toFixed(2);
+        row.appendChild(subtotalTd);
+
+        const removeTd = document.createElement('td');
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'X';
+        removeBtn.onclick = () => removeCartItem(index);
+        removeTd.appendChild(removeBtn);
+        row.appendChild(removeTd);
+
+        cartTableBody.appendChild(row);
+      });
+
+      grandTotalEl.textContent = 'Grand Total: R$' + grandTotal.toFixed(2);
+    }
+
+    /************************************************************
+     * Initialization / Event Listeners
+     ************************************************************/
+    // Update dropdowns on page load
+    updateDropdowns();
+
+    // Whenever perf class changes, re-populate memory ratio & vCPUs
+    performanceClassSelect.addEventListener('change', updateDropdowns);
+
+    // Add to cart
+    document.getElementById('addBtn').addEventListener('click', addToCart);
   </script>
 </body>
 </html>
+
