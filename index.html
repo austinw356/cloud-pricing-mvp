@@ -1,8 +1,5 @@
 <!DOCTYPE html>
-cloud-pricing-mvp (the repository)
-|
-└── index.html
-
+index.html
 <html>
 <head>
   <meta charset="utf-8" />
@@ -10,29 +7,75 @@ cloud-pricing-mvp (the repository)
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 40px;
-      max-width: 800px;
+      margin: 40px auto;
+      max-width: 900px;
+      background: #f4f4f4;
+      padding: 20px;
     }
+
     h1 {
+      margin-bottom: 8px;
+    }
+
+    .disclaimer {
+      font-size: 0.9em;
+      color: #555;
       margin-bottom: 20px;
     }
+
+    .card {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      margin-top: 0;
+      margin-bottom: 20px;
+      font-size: 1.2em;
+      color: #333;
+    }
+
     .field {
       margin-bottom: 16px;
     }
     label {
       display: inline-block;
-      width: 200px;
+      width: 220px;
+      font-weight: bold;
+      margin-bottom: 6px;
     }
+
     select, input[type="number"] {
-      min-width: 120px;
+      min-width: 150px;
+      padding: 4px;
     }
+
     button {
-      margin: 8px 0;
+      margin-top: 8px;
+      padding: 6px 12px;
+      cursor: pointer;
+      background: #007bff;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
     }
+    button:hover {
+      background: #0056b3;
+    }
+
+    .disabled {
+      background-color: #ccc !important;
+      cursor: not-allowed;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
+      background: #fff;
     }
     th, td {
       border: 1px solid #ddd;
@@ -42,88 +85,110 @@ cloud-pricing-mvp (the repository)
     th {
       background-color: #f9f9f9;
     }
-    #grandTotal {
-      font-weight: bold;
-      color: #2c3e50;
+    td button {
+      background: #dc3545;
     }
-    .disabled {
-      background-color: #ccc;
+    td button:hover {
+      background: #a71d2a;
+    }
+
+    .totals-section {
+      margin-top: 20px;
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 16px;
+    }
+    .totals-section p {
+      margin: 0;
+      padding: 4px 0;
+      font-weight: bold;
+    }
+    .totals-section p span {
+      float: right;
     }
   </style>
 </head>
 <body>
 
   <h1>Magalu Cloud Pricing Calculator (Test)</h1>
+  <p class="disclaimer">
+    Prices shown are monthly estimates (billed by the second). Taxes included.
+  </p>
 
-  <!-- Only one resource type: Virtual Machines -->
-  <div class="field">
-    <label for="resourceType">Resource Type:</label>
-    <select id="resourceType" disabled>
-      <option value="VM" selected>Virtual Machines</option>
-    </select>
+  <div class="card">
+    <h2>Add a New Resource</h2>
+
+    <!-- Only one resource type: Virtual Machines -->
+    <div class="field">
+      <label>Resource Type:</label>
+      <select id="resourceType" disabled>
+        <option value="VM" selected>Virtual Machines</option>
+      </select>
+    </div>
+
+    <!-- Performance Class -->
+    <div class="field">
+      <label for="perfClass">Performance Class:</label>
+      <select id="perfClass">
+        <option value="BV">Balanced Value (BV)</option>
+        <option value="DP">Dedicated Performance (DP)</option>
+      </select>
+    </div>
+
+    <!-- OS Type (moved above Memory Ratio) -->
+    <div class="field">
+      <label for="osType">OS Type:</label>
+      <select id="osType">
+        <option value="Linux">Linux</option>
+        <option value="Windows">Windows (+R$150/vCPU)</option>
+      </select>
+    </div>
+
+    <!-- Memory Ratio -->
+    <div class="field">
+      <label for="memoryRatio">Memory Ratio (RAM / vCPU):</label>
+      <select id="memoryRatio">
+        <!-- Will update dynamically for BV or DP -->
+      </select>
+    </div>
+
+    <!-- vCPUs -->
+    <div class="field">
+      <label for="vcpus">VM Size (# of vCPUs):</label>
+      <select id="vcpus">
+        <!-- Will update dynamically for BV or DP -->
+      </select>
+    </div>
+
+    <!-- Local Disk -->
+    <div class="field">
+      <label for="localDisk">Local Disk Size (GiB):</label>
+      <select id="localDisk">
+        <!-- Will update dynamically -->
+      </select>
+    </div>
+
+    <!-- GPU -->
+    <div class="field">
+      <label for="gpu">Optional GPU:</label>
+      <select id="gpu">
+        <option value="0">No GPU</option>
+        <option value="1">1x Nvidia L40 (+R$5110)</option>
+        <option value="2">2x Nvidia L40 (+R$10220)</option>
+      </select>
+      <span id="gpuNote" style="color: #d00; margin-left: 10px;"></span>
+    </div>
+
+    <!-- Quantity -->
+    <div class="field">
+      <label for="quantity">Quantity of Instances:</label>
+      <input type="number" id="quantity" value="1" min="1" />
+    </div>
+
+    <!-- Button to add instance -->
+    <button id="addInstanceBtn">Add This Configuration</button>
   </div>
-
-  <!-- Performance Class -->
-  <div class="field">
-    <label for="perfClass">Performance Class:</label>
-    <select id="perfClass">
-      <option value="BV">Balanced Value (BV)</option>
-      <option value="DP">Dedicated Performance (DP)</option>
-    </select>
-  </div>
-
-  <!-- Memory Ratio -->
-  <div class="field">
-    <label for="memoryRatio">Memory Ratio (RAM / vCPU):</label>
-    <select id="memoryRatio">
-      <!-- BV default options (will change dynamically if needed) -->
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="4">4</option>
-    </select>
-  </div>
-
-  <!-- vCPUs -->
-  <div class="field">
-    <label for="vcpus">VM Size (# of vCPUs):</label>
-    <select id="vcpus">
-      <!-- BV default options -->
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="4">4</option>
-      <option value="8">8</option>
-    </select>
-  </div>
-
-  <!-- OS -->
-  <div class="field">
-    <label for="osType">OS Type:</label>
-    <select id="osType">
-      <option value="Linux">Linux</option>
-      <option value="Windows">Windows (+R$150/vCPU)</option>
-    </select>
-  </div>
-
-  <!-- Local Disk -->
-  <div class="field">
-    <label for="localDisk">Local Disk Size (GiB):</label>
-    <select id="localDisk">
-      <!-- Will update dynamically based on perfClass + OS -->
-    </select>
-  </div>
-
-  <!-- GPU -->
-  <div class="field">
-    <label for="gpu">Optional GPU:</label>
-    <select id="gpu">
-      <option value="0">No GPU</option>
-      <option value="1">1x Nvidia L40 (+R$5110)</option>
-      <option value="2">2x Nvidia L40 (+R$10220)</option>
-    </select>
-  </div>
-
-  <!-- Button to add instance to a "cart" -->
-  <button id="addInstanceBtn">Add This Instance</button>
 
   <!-- Table listing the chosen instances -->
   <table id="instancesTable">
@@ -136,24 +201,28 @@ cloud-pricing-mvp (the repository)
         <th>OS</th>
         <th>Disk (GiB)</th>
         <th>GPU(s)</th>
+        <th>Qty</th>
         <th>Subtotal (R$)</th>
         <th>Remove</th>
       </tr>
     </thead>
     <tbody>
-      <!-- Rows get added here dynamically -->
+      <!-- Rows added dynamically -->
     </tbody>
   </table>
 
-  <h2>Grand Total: <span id="grandTotal">R$0.00</span></h2>
+  <div class="totals-section">
+    <!-- Subtotal for VMs (and later other resource types) -->
+    <p>Virtual Machines: <span id="vmSubtotal">R$0.00</span></p>
+    <p>Total Monthly Cost: <span id="totalMonthlyCost">R$0.00</span></p>
+  </div>
 
   <script>
-    // ------------------------------------------------------------------
-    // 1) Data definitions & dynamic updating for dropdowns
-    // ------------------------------------------------------------------
+    // --------------------------------------------------------
+    // 1) Data Definitions
+    // --------------------------------------------------------
 
-    // For Balanced Value (BV) and Dedicated Performance (DP),
-    // define memoryRatios and vCPU options:
+    // Balanced Value (BV) or Dedicated Performance (DP)
     const memoryRatiosBV = [1, 2, 4];
     const memoryRatiosDP = [2, 4, 8];
 
@@ -173,30 +242,29 @@ cloud-pricing-mvp (the repository)
           return [40, 80, 160];
         }
       } else {
-        // DP
+        // DP (both OS)
         return [100, 150, 250];
       }
     }
 
-    // GPU is only supported for BV. If perfClass=DP, we disable the GPU field.
-    // We'll handle that in updateForm().
-
     // HTML elements
     const perfClassEl = document.getElementById('perfClass');
+    const osTypeEl = document.getElementById('osType');
     const memoryRatioEl = document.getElementById('memoryRatio');
     const vcpusEl = document.getElementById('vcpus');
-    const osTypeEl = document.getElementById('osType');
     const localDiskEl = document.getElementById('localDisk');
     const gpuEl = document.getElementById('gpu');
+    const gpuNoteEl = document.getElementById('gpuNote');
+    const quantityEl = document.getElementById('quantity');
 
-    // ------------------------------------------------------------------
-    // 2) Update form fields based on user selections
-    // ------------------------------------------------------------------
+    // --------------------------------------------------------
+    // 2) Update Form Fields Dynamically
+    // --------------------------------------------------------
     function updateForm() {
       const currentPerfClass = perfClassEl.value;
       const currentOS = osTypeEl.value;
 
-      // Update memory ratio dropdown
+      // Memory ratios
       let ratios = (currentPerfClass === 'BV') ? memoryRatiosBV : memoryRatiosDP;
       memoryRatioEl.innerHTML = '';
       ratios.forEach(r => {
@@ -206,7 +274,7 @@ cloud-pricing-mvp (the repository)
         memoryRatioEl.appendChild(opt);
       });
 
-      // Update vCPUs dropdown
+      // vCPUs
       let vcpuOpts = (currentPerfClass === 'BV') ? vcpusBV : vcpusDP;
       vcpusEl.innerHTML = '';
       vcpuOpts.forEach(v => {
@@ -216,7 +284,7 @@ cloud-pricing-mvp (the repository)
         vcpusEl.appendChild(opt);
       });
 
-      // Update local disk dropdown
+      // Local disk
       let diskOpts = getLocalDiskOptions(currentPerfClass, currentOS);
       localDiskEl.innerHTML = '';
       diskOpts.forEach(d => {
@@ -226,98 +294,105 @@ cloud-pricing-mvp (the repository)
         localDiskEl.appendChild(opt);
       });
 
-      // Update GPU dropdown (disable if DP)
+      // GPU logic:
+      // - If perfClass=DP => GPU not available
+      // - If OS=Windows => GPU not available
+      // So we disable the select and show a note accordingly.
+      let disableGPU = false;
+      let note = '';
       if (currentPerfClass === 'DP') {
-        gpuEl.value = '0'; // reset
-        gpuEl.disabled = true;
+        disableGPU = true;
+        note = 'GPU not available on this performance class';
+      } else if (currentOS === 'Windows') {
+        disableGPU = true;
+        note = 'GPU not available with Windows';
+      }
+
+      gpuEl.disabled = disableGPU;
+      if (disableGPU) {
+        gpuEl.value = '0'; // reset to no GPU
+        gpuNoteEl.textContent = note;
       } else {
-        gpuEl.disabled = false;
+        gpuNoteEl.textContent = '';
       }
     }
 
-    // Listen for changes to Performance Class or OS
     perfClassEl.addEventListener('change', updateForm);
     osTypeEl.addEventListener('change', updateForm);
 
-    // On first load, call updateForm to set defaults
+    // Initialize
     updateForm();
 
-    // ------------------------------------------------------------------
-    // 3) Pricing logic
-    // ------------------------------------------------------------------
-
+    // --------------------------------------------------------
+    // 3) Pricing Logic
+    // --------------------------------------------------------
     /*
-      We’ll define a simple formula:
-        basePrice = 35   -> for 1 vCPU + 1 GB RAM in BV + Linux + 0 disk + 0 GPU
-        memoryRatioFactor = memoryRatio
-        perfClassFactor = 1 for BV, 1.5 for DP  (example only)
-        vcpus
-        OS Surcharge = 150 per vCPU if Windows
-        Disk cost = (diskSize / 10) * 8
-        GPU cost = 5110 * numberOfGPUs (only if BV)
-
-      totalCost = basePrice 
-                  * perfClassFactor
-                  * ( vcpus ) 
-                  * ( memoryRatioFactor )
-                + OS_surcharge
-                + disk_cost
-                + gpu_cost
+      basePrice = 35 for 1 vCPU, memRatio=1, BV, Linux, 0 disk, 0 GPU
+      perfClassFactor = 1 for BV, 1.5 for DP
+      totalComputeCost = basePrice * perfClassFactor * vcpus * memRatio
+      Windows surcharge = 150 * vcpus (if OS=Windows)
+      disk cost = (diskSize / 10) * 8
+      GPU cost = 5110 * numberOfGPUs (only if not disabled)
+      Then multiplied by quantity
     */
-
-    function calculateCost(perfClass, memRatio, vcpus, os, diskSize, gpuCount) {
-      const basePrice = 35; 
+    function calculateCost(perfClass, memRatio, vcpus, os, diskSize, gpuCount, quantity) {
+      const basePrice = 35;
       const perfClassFactor = (perfClass === 'BV') ? 1 : 1.5;
       const memoryRatioFactor = parseInt(memRatio, 10);
       const numVcpus = parseInt(vcpus, 10);
       const numDiskGiB = parseInt(diskSize, 10);
       const gpus = parseInt(gpuCount, 10);
+      const qty = parseInt(quantity, 10);
 
-      // Core compute cost
+      // compute cost
       let computeCost = basePrice * perfClassFactor * numVcpus * memoryRatioFactor;
 
       // Windows surcharge
       let osSurcharge = 0;
       if (os === 'Windows') {
-        osSurcharge = 150 * numVcpus; 
+        osSurcharge = 150 * numVcpus;
       }
 
       // Disk cost
-      // Each 10 GiB is R$8, so diskSize/10 * 8
       let diskCost = (numDiskGiB / 10) * 8;
 
-      // GPU cost if BV (DP is disabled from UI anyway)
-      let gpuCost = 0;
-      // Price is R$5110 per GPU
-      gpuCost = 5110 * gpus;
+      // GPU cost
+      let gpuCost = 5110 * gpus; // if GPU is disabled, gpus=0
 
-      const total = computeCost + osSurcharge + diskCost + gpuCost;
+      // Sum up and then multiply by quantity
+      let total = (computeCost + osSurcharge + diskCost + gpuCost) * qty;
       return total;
     }
 
-    // ------------------------------------------------------------------
-    // 4) "Add Instance" function & dynamic table updates
-    // ------------------------------------------------------------------
+    // --------------------------------------------------------
+    // 4) Add Instances & Render Table
+    // --------------------------------------------------------
     const addBtn = document.getElementById('addInstanceBtn');
     const instancesTableBody = document.querySelector('#instancesTable tbody');
-    const grandTotalEl = document.getElementById('grandTotal');
 
-    let instances = []; // will store { perfClass, memRatio, vcpus, os, diskSize, gpuCount, subtotal }
+    let instances = []; // each item => { resourceType, sku, perfClass, vcpus, ramGB, os, disk, gpu, quantity, subtotal }
 
     function addInstance() {
-      // Gather inputs
       const perfClassVal = perfClassEl.value;
+      const osVal = osTypeEl.value;
       const memRatioVal = memoryRatioEl.value;
       const vcpusVal = vcpusEl.value;
-      const osVal = osTypeEl.value;
       const diskVal = localDiskEl.value;
       const gpuVal = gpuEl.value;
+      const quantityVal = quantityEl.value;
 
       // Calculate cost
-      const subtotal = calculateCost(perfClassVal, memRatioVal, vcpusVal, osVal, diskVal, gpuVal);
+      const subtotal = calculateCost(
+        perfClassVal,
+        memRatioVal,
+        vcpusVal,
+        osVal,
+        diskVal,
+        gpuVal,
+        quantityVal
+      );
 
-      // Build a simple SKU string for reference
-      // e.g. "BV-2vCPU-2GB-Linux-20GiB-0GPU"
+      // Build a SKU string
       const ramGB = parseInt(vcpusVal, 10) * parseInt(memRatioVal, 10);
       const sku = [
         perfClassVal,
@@ -325,11 +400,12 @@ cloud-pricing-mvp (the repository)
         ramGB + 'GB',
         osVal,
         diskVal + 'GiB',
-        gpuVal + 'GPU'
+        gpuVal + 'GPU',
+        'Qty' + quantityVal
       ].join('-');
 
-      // Store in array
       const instanceItem = {
+        resourceType: 'VM',
         sku,
         perfClass: perfClassVal,
         vcpus: vcpusVal,
@@ -337,51 +413,65 @@ cloud-pricing-mvp (the repository)
         os: osVal,
         disk: diskVal,
         gpu: gpuVal,
+        quantity: parseInt(quantityVal, 10),
         subtotal
       };
       instances.push(instanceItem);
 
-      // Render a new row in the table
+      // Re-render the table
       renderTable();
     }
 
     function renderTable() {
-      // Clear existing rows
       instancesTableBody.innerHTML = '';
 
-      // Rebuild all rows
+      let vmSum = 0;
       let grandTotal = 0;
+
       instances.forEach((inst, idx) => {
         const tr = document.createElement('tr');
 
+        // SKU
         const skuTd = document.createElement('td');
         skuTd.textContent = inst.sku;
         tr.appendChild(skuTd);
 
+        // PerfClass
         const perfTd = document.createElement('td');
         perfTd.textContent = inst.perfClass;
         tr.appendChild(perfTd);
 
+        // vCPUs
         const vcpusTd = document.createElement('td');
         vcpusTd.textContent = inst.vcpus;
         tr.appendChild(vcpusTd);
 
+        // RAM
         const ramTd = document.createElement('td');
         ramTd.textContent = inst.ramGB;
         tr.appendChild(ramTd);
 
+        // OS
         const osTd = document.createElement('td');
         osTd.textContent = inst.os;
         tr.appendChild(osTd);
 
+        // Disk
         const diskTd = document.createElement('td');
         diskTd.textContent = inst.disk;
         tr.appendChild(diskTd);
 
+        // GPU
         const gpuTd = document.createElement('td');
         gpuTd.textContent = inst.gpu;
         tr.appendChild(gpuTd);
 
+        // Quantity
+        const qtyTd = document.createElement('td');
+        qtyTd.textContent = inst.quantity;
+        tr.appendChild(qtyTd);
+
+        // Subtotal
         const subtotalTd = document.createElement('td');
         subtotalTd.textContent = 'R$' + inst.subtotal.toFixed(2);
         tr.appendChild(subtotalTd);
@@ -391,7 +481,6 @@ cloud-pricing-mvp (the repository)
         const removeBtn = document.createElement('button');
         removeBtn.textContent = 'X';
         removeBtn.addEventListener('click', () => {
-          // Remove this instance from array
           instances.splice(idx, 1);
           renderTable();
         });
@@ -400,16 +489,20 @@ cloud-pricing-mvp (the repository)
 
         instancesTableBody.appendChild(tr);
 
+        // Summation
         grandTotal += inst.subtotal;
+        if (inst.resourceType === 'VM') {
+          vmSum += inst.subtotal;
+        }
       });
 
-      // Update grand total
-      grandTotalEl.textContent = 'R$' + grandTotal.toFixed(2);
+      // Update sub-totals and total cost
+      document.getElementById('vmSubtotal').textContent = 'R$' + vmSum.toFixed(2);
+      document.getElementById('totalMonthlyCost').textContent = 'R$' + grandTotal.toFixed(2);
     }
 
     addBtn.addEventListener('click', addInstance);
+
   </script>
 </body>
 </html>
-
-
