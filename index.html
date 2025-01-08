@@ -1,23 +1,24 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
+  <meta charset="utf-8">
   <title>Magalu Cloud Pricing Calculator (Test)</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 40px auto;
-      max-width: 1000px;
+      margin: 0 auto;
+      max-width: 1200px;
       background: #f4f4f4;
       padding: 20px;
     }
     h1 {
-      margin-bottom: 8px;
+      margin-top: 0;
     }
-    .disclaimer {
-      font-size: 0.9em;
-      color: #555;
-      margin-bottom: 20px;
+    .section-title {
+      margin-top: 40px;
+      margin-bottom: 8px;
+      font-size: 1.3em;
+      color: #333;
     }
     .card {
       background: #fff;
@@ -26,18 +27,12 @@
       padding: 20px;
       margin-bottom: 20px;
     }
-    .card h2 {
-      margin-top: 0;
-      margin-bottom: 20px;
-      font-size: 1.2em;
-      color: #333;
-    }
     .field {
       margin-bottom: 16px;
     }
     label {
       display: inline-block;
-      width: 220px;
+      width: 200px;
       font-weight: bold;
       margin-bottom: 6px;
     }
@@ -81,23 +76,26 @@
     td button:hover {
       background: #a71d2a;
     }
-    .totals-section {
-      margin-top: 20px;
+    tfoot td {
+      font-weight: bold;
+      background: #f0f0f0;
+    }
+    .summary-section {
       background: #fff;
       border: 1px solid #ddd;
       border-radius: 5px;
       padding: 16px;
+      margin-top: 30px;
     }
-    .totals-section h3 {
-      margin-top: 0;
-      margin-bottom: 10px;
+    .summary-section p {
+      margin: 8px 0;
+      font-weight: bold;
+      font-size: 1.1em;
     }
-    .totals-section p {
-      margin: 0;
-      padding: 4px 0;
-    }
-    .totals-section p span {
-      float: right;
+    .disclaimer {
+      font-size: 0.9em;
+      color: #555;
+      margin-bottom: 20px;
     }
   </style>
 </head>
@@ -108,155 +106,240 @@
     Prices shown are monthly estimates (billed by the second). Taxes included.
   </p>
 
+  <!-- ************************************************** -->
+  <!--                VIRTUAL MACHINES                   -->
+  <!-- ************************************************** -->
   <div class="card">
-    <h2>Add a New Resource</h2>
+    <h2 class="section-title">Add Virtual Machines</h2>
 
-    <!-- Resource Type: VM or Object Storage -->
     <div class="field">
-      <label for="resourceType">Resource Type:</label>
-      <select id="resourceType">
-        <option value="VM" selected>Virtual Machines</option>
-        <option value="ObjectStorage">Object Storage</option>
+      <label>Resource Type:</label>
+      <input type="text" value="Virtual Machines" disabled />
+    </div>
+
+    <div class="field">
+      <label for="vmPerfClass">Performance Class:</label>
+      <select id="vmPerfClass">
+        <option value="BV">Balanced Value (BV)</option>
+        <option value="DP">Dedicated Performance (DP)</option>
       </select>
     </div>
 
-    <!-- =============== VIRTUAL MACHINE FIELDS =============== -->
-    <div id="vmFields">
-      <!-- Performance Class -->
-      <div class="field">
-        <label for="perfClass">Performance Class:</label>
-        <select id="perfClass">
-          <option value="BV">Balanced Value (BV)</option>
-          <option value="DP">Dedicated Performance (DP)</option>
-        </select>
-      </div>
-
-      <!-- OS Type -->
-      <div class="field">
-        <label for="osType">OS Type:</label>
-        <select id="osType">
-          <option value="Linux">Linux</option>
-          <option value="Windows">Windows (+R$150/vCPU)</option>
-        </select>
-      </div>
-
-      <!-- Memory Ratio -->
-      <div class="field">
-        <label for="memoryRatio">Memory Ratio (RAM / vCPU):</label>
-        <select id="memoryRatio">
-          <!-- Will update dynamically -->
-        </select>
-      </div>
-
-      <!-- vCPUs -->
-      <div class="field">
-        <label for="vcpus">VM Size (# of vCPUs):</label>
-        <select id="vcpus">
-          <!-- Will update dynamically -->
-        </select>
-      </div>
-
-      <!-- Local Disk -->
-      <div class="field">
-        <label for="localDisk">Local Disk Size (GiB):</label>
-        <select id="localDisk">
-          <!-- Will update dynamically -->
-        </select>
-      </div>
-
-      <!-- GPU -->
-      <div class="field">
-        <label for="gpu">Optional GPU:</label>
-        <select id="gpu">
-          <option value="0">No GPU</option>
-          <option value="1">1x Nvidia L40 (+R$5110)</option>
-          <option value="2">2x Nvidia L40 (+R$10220)</option>
-        </select>
-        <span id="gpuNote" style="color: #d00; margin-left: 10px;"></span>
-      </div>
-    </div>
-
-    <!-- =============== OBJECT STORAGE FIELDS =============== -->
-    <div id="storageFields" style="display: none;">
-      <div class="field">
-        <label for="storageClass">Storage Class:</label>
-        <select id="storageClass">
-          <option value="Standard" selected>Standard (R$0.10/GB)</option>
-          <option value="ColdInstant">Cold Instant (R$0.06/GB + R$0.10/GB retrieval)</option>
-        </select>
-      </div>
-      <div class="field">
-        <label for="storageGiB"># of GiBs Stored:</label>
-        <input type="number" id="storageGiB" value="500" min="1" />
-      </div>
-      <div class="field">
-        <label for="retrievedGiB">GiBs Retrieved per Month:</label>
-        <input type="number" id="retrievedGiB" value="100" min="0" />
-      </div>
-    </div>
-
-    <!-- Shared quantity field (applies to both VM and Storage) -->
     <div class="field">
-      <label for="quantity">Quantity of Instances:</label>
-      <input type="number" id="quantity" value="1" min="1" />
+      <label for="vmOsType">OS Type:</label>
+      <select id="vmOsType">
+        <option value="Linux">Linux</option>
+        <option value="Windows">Windows (+R$150/vCPU)</option>
+      </select>
     </div>
 
-    <button id="addResourceBtn">Add This Configuration</button>
+    <div class="field">
+      <label for="vmMemoryRatio">Memory Ratio (RAM / vCPU):</label>
+      <select id="vmMemoryRatio">
+        <!-- Will be updated dynamically -->
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="vmVcpus">VM Size (# of vCPUs):</label>
+      <select id="vmVcpus">
+        <!-- Will be updated dynamically -->
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="vmLocalDisk">Local Disk Size (GiB):</label>
+      <select id="vmLocalDisk">
+        <!-- Will be updated dynamically -->
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="vmGpu">Optional GPU:</label>
+      <select id="vmGpu">
+        <option value="0">No GPU</option>
+        <option value="1">1x Nvidia L40 (+R$5110)</option>
+        <option value="2">2x Nvidia L40 (+R$10220)</option>
+      </select>
+      <span id="vmGpuNote" style="color: #d00; margin-left: 10px;"></span>
+    </div>
+
+    <div class="field">
+      <label for="vmQuantity">Quantity of Instances:</label>
+      <input type="number" id="vmQuantity" value="1" min="1" />
+    </div>
+
+    <button id="addVmBtn">Add VM Configuration</button>
   </div>
 
-  <!-- =============== TABLE OF ADDED RESOURCES =============== -->
-  <table id="instancesTable">
+  <!-- VM Table -->
+  <table id="vmTable">
     <thead>
       <tr>
-        <th>Resource Type</th>
-        <th>SKU / Details</th>
+        <th>SKU</th>
+        <th>Perf Class</th>
+        <th>vCPUs</th>
+        <th>RAM (GB)</th>
+        <th>OS</th>
+        <th>Disk (GiB)</th>
+        <th>GPU(s)</th>
         <th>Qty</th>
         <th>Subtotal (R$)</th>
         <th>Remove</th>
       </tr>
     </thead>
     <tbody>
-      <!-- Rows added dynamically -->
+      <!-- VM rows here -->
     </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="2" id="vmTotalVcpusLabel">Total vCPUs: 0</td>
+        <td colspan="2" id="vmTotalRamLabel">Total RAM (GB): 0</td>
+        <td colspan="3" style="text-align:right;">VM Subtotal:</td>
+        <td colspan="2" id="vmSubtotal">R$0.00</td>
+        <td></td>
+      </tr>
+    </tfoot>
   </table>
 
-  <!-- =============== SUMMARY / TOTALS SECTION =============== -->
-  <div class="totals-section" id="totalsSection">
-    <h3>Summary</h3>
+  <!-- ************************************************** -->
+  <!--                OBJECT STORAGE                     -->
+  <!-- ************************************************** -->
+  <div class="card">
+    <h2 class="section-title">Add Object Storage</h2>
 
-    <!-- VMs -->
-    <p>**Virtual Machines**</p>
-    <p>Total vCPUs: <span id="vmTotalVcpus">0</span></p>
-    <p>Total RAM (GB): <span id="vmTotalRam">0</span></p>
-    <p>Total VM Cost: <span id="vmTotalCost">R$0.00</span></p>
+    <div class="field">
+      <label for="osClass">Storage Class:</label>
+      <select id="osClass">
+        <option value="Standard">Standard</option>
+        <option value="ColdInstant">Cold Instant</option>
+      </select>
+    </div>
 
-    <!-- Object Storage -->
-    <br />
-    <p>**Object Storage**</p>
-    <p>Total GB Stored: <span id="storageTotalGiB">0</span></p>
-    <p>Total GB Retrieved: <span id="storageTotalRetrieved">0</span></p>
-    <p>Total Storage Cost: <span id="storageTotalCost">R$0.00</span></p>
+    <div class="field">
+      <label for="osGiBs"># of GiBs (Storage):</label>
+      <input type="number" id="osGiBs" value="500" min="1" />
+    </div>
 
-    <br />
-    <p><strong>Total Monthly Cost:</strong> <span id="grandTotalCost">R$0.00</span></p>
+    <div class="field">
+      <label for="osGiBsRetrieved">GiBs Retrieved per Month:</label>
+      <input type="number" id="osGiBsRetrieved" value="100" min="0" />
+    </div>
+
+    <button id="addObjectStorageBtn">Add Object Storage</button>
   </div>
 
-  <script>
-    // ----------------------------------------------------------------
-    // A) Data & Pricing
-    // ----------------------------------------------------------------
+  <!-- Object Storage Table -->
+  <table id="objectStorageTable">
+    <thead>
+      <tr>
+        <th>SKU</th>
+        <th>Class</th>
+        <th>GiBs Stored</th>
+        <th>GiBs Retrieved</th>
+        <th>Subtotal (R$)</th>
+        <th>Remove</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Object Storage rows here -->
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4" style="text-align:right;">Object Storage Subtotal:</td>
+        <td id="objectStorageSubtotal">R$0.00</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
 
-    // Balanced Value (BV) or Dedicated Performance (DP)
+
+  <!-- ************************************************** -->
+  <!--              BLOCK STORAGE VOLUMES               -->
+  <!-- ************************************************** -->
+  <div class="card">
+    <h2 class="section-title">Add Block Storage Volumes</h2>
+
+    <div class="field">
+      <label>Storage Class:</label>
+      <!-- Per request, only "NVMe Standard" is available -->
+      <input type="text" value="NVMe Standard" disabled />
+    </div>
+
+    <div class="field">
+      <label for="bsIops">IOPS:</label>
+      <select id="bsIops">
+        <option value="1000">1K</option>
+        <option value="5000">5K</option>
+        <option value="10000">10K</option>
+        <option value="15000">15K</option>
+        <option value="20000">20K</option>
+      </select>
+    </div>
+
+    <div class="field">
+      <label for="bsVolumeSize">Volume Size (GiB):</label>
+      <input type="number" id="bsVolumeSize" value="250" min="10" max="1024" />
+    </div>
+
+    <div class="field">
+      <label for="bsQuantity">Quantity of Volumes:</label>
+      <input type="number" id="bsQuantity" value="1" min="1" />
+    </div>
+
+    <button id="addBlockStorageBtn">Add Block Volume</button>
+  </div>
+
+  <!-- Block Storage Table -->
+  <table id="blockStorageTable">
+    <thead>
+      <tr>
+        <th>SKU</th>
+        <th>IOPS</th>
+        <th>Size (GiB)</th>
+        <th>Quantity</th>
+        <th>Subtotal (R$)</th>
+        <th>Remove</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Block Storage rows here -->
+    </tbody>
+    <tfoot>
+      <tr>
+        <td colspan="4" style="text-align:right;">Block Storage Subtotal:</td>
+        <td id="blockStorageSubtotal">R$0.00</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <!-- ************************************************** -->
+  <!--                    SUMMARY                         -->
+  <!-- ************************************************** -->
+  <div class="summary-section">
+    <p>Virtual Machines: <span id="summaryVmSubtotal">R$0.00</span></p>
+    <p>Object Storage: <span id="summaryObjectSubtotal">R$0.00</span></p>
+    <p>Block Storage: <span id="summaryBlockSubtotal">R$0.00</span></p>
+    <hr/>
+    <p>Overall Monthly Total: <span id="overallTotal">R$0.00</span></p>
+  </div>
+
+
+  <script>
+    // ---------------------------------------------------------
+    //   1) Data and Utility for Virtual Machines
+    // ---------------------------------------------------------
     const memoryRatiosBV = [1, 2, 4];
     const memoryRatiosDP = [2, 4, 8];
+
     const vcpusBV = [1, 2, 4, 8];
     const vcpusDP = [2, 4, 8, 16, 32];
 
-    // Local disk options:
-    // BV + Linux => [10, 20, 40, 100]
-    // BV + Windows => [40, 80, 160]
-    // DP (Linux or Windows) => [100, 150, 250]
     function getLocalDiskOptions(perfClass, os) {
+      // BV + Linux => [10, 20, 40, 100]
+      // BV + Windows => [40, 80, 160]
+      // DP => [100, 150, 250]
       if (perfClass === 'BV') {
         if (os === 'Linux') {
           return [10, 20, 40, 100];
@@ -264,158 +347,19 @@
           return [40, 80, 160];
         }
       } else {
-        // DP
         return [100, 150, 250];
       }
     }
 
-    // ----------------------------------------------------------------
-    // B) DOM Elements
-    // ----------------------------------------------------------------
-    const resourceTypeEl  = document.getElementById('resourceType');
-
-    // VM fields
-    const vmFieldsEl      = document.getElementById('vmFields');
-    const perfClassEl     = document.getElementById('perfClass');
-    const osTypeEl        = document.getElementById('osType');
-    const memoryRatioEl   = document.getElementById('memoryRatio');
-    const vcpusEl         = document.getElementById('vcpus');
-    const localDiskEl     = document.getElementById('localDisk');
-    const gpuEl           = document.getElementById('gpu');
-    const gpuNoteEl       = document.getElementById('gpuNote');
-
-    // Object Storage fields
-    const storageFieldsEl = document.getElementById('storageFields');
-    const storageClassEl  = document.getElementById('storageClass');
-    const storageGiBEl    = document.getElementById('storageGiB');
-    const retrievedGiBEl  = document.getElementById('retrievedGiB');
-
-    // Shared
-    const quantityEl      = document.getElementById('quantity');
-    const addResourceBtn  = document.getElementById('addResourceBtn');
-    const instancesTableBody = document.querySelector('#instancesTable tbody');
-
-    // Totals section
-    const vmTotalVcpusEl  = document.getElementById('vmTotalVcpus');
-    const vmTotalRamEl    = document.getElementById('vmTotalRam');
-    const vmTotalCostEl   = document.getElementById('vmTotalCost');
-    const storageTotalGiBEl = document.getElementById('storageTotalGiB');
-    const storageTotalRetrievedEl = document.getElementById('storageTotalRetrieved');
-    const storageTotalCostEl = document.getElementById('storageTotalCost');
-    const grandTotalCostEl = document.getElementById('grandTotalCost');
-
-    // Data store for all added resources
-    let instances = [];
-
-    // ----------------------------------------------------------------
-    // C) Show/Hide fields based on Resource Type
-    // ----------------------------------------------------------------
-    function updateResourceTypeUI() {
-      const selectedType = resourceTypeEl.value;
-
-      if (selectedType === 'VM') {
-        vmFieldsEl.style.display = 'block';
-        storageFieldsEl.style.display = 'none';
-      } else {
-        vmFieldsEl.style.display = 'none';
-        storageFieldsEl.style.display = 'block';
-      }
-    }
-
-    resourceTypeEl.addEventListener('change', updateResourceTypeUI);
-
-    // ----------------------------------------------------------------
-    // D) VM Form Field Updates
-    // ----------------------------------------------------------------
-    function updateVMFields() {
-      const currentPerfClass = perfClassEl.value;
-      const currentOS = osTypeEl.value;
-
-      // Memory Ratios
-      let ratios = (currentPerfClass === 'BV') ? memoryRatiosBV : memoryRatiosDP;
-      memoryRatioEl.innerHTML = '';
-      ratios.forEach(r => {
-        const opt = document.createElement('option');
-        opt.value = r;
-        opt.textContent = r;
-        memoryRatioEl.appendChild(opt);
-      });
-
-      // vCPUs
-      let vcpuOpts = (currentPerfClass === 'BV') ? vcpusBV : vcpusDP;
-      vcpusEl.innerHTML = '';
-      vcpuOpts.forEach(v => {
-        const opt = document.createElement('option');
-        opt.value = v;
-        opt.textContent = v;
-        vcpusEl.appendChild(opt);
-      });
-
-      // Local Disk
-      let diskOpts = getLocalDiskOptions(currentPerfClass, currentOS);
-      localDiskEl.innerHTML = '';
-      diskOpts.forEach(d => {
-        const opt = document.createElement('option');
-        opt.value = d;
-        opt.textContent = d;
-        localDiskEl.appendChild(opt);
-      });
-
-      // GPU logic:
-      // disable if DP or OS=Windows
-      let disableGPU = false;
-      let note = '';
-      if (currentPerfClass === 'DP') {
-        disableGPU = true;
-        note = 'GPU not available on this performance class';
-      } else if (currentOS === 'Windows') {
-        disableGPU = true;
-        note = 'GPU not available with Windows';
-      }
-      gpuEl.disabled = disableGPU;
-      if (disableGPU) {
-        gpuEl.value = '0';
-        gpuNoteEl.textContent = note;
-      } else {
-        gpuNoteEl.textContent = '';
-      }
-    }
-
-    perfClassEl.addEventListener('change', updateVMFields);
-    osTypeEl.addEventListener('change', updateVMFields);
-
-    // also if storageClass changes, hide or show retrieval input
-    storageClassEl.addEventListener('change', () => {
-      if (storageClassEl.value === 'Standard') {
-        // no retrieval fees
-        retrievedGiBEl.disabled = true;
-        retrievedGiBEl.value = 0; 
-      } else {
-        retrievedGiBEl.disabled = false;
-        if (parseInt(retrievedGiBEl.value, 10) === 0) {
-          retrievedGiBEl.value = 100; // default if it was 0
-        }
-      }
-    });
-
-    // Init
-    updateResourceTypeUI();
-    updateVMFields();
-
-    // ----------------------------------------------------------------
-    // E) Cost Calculations
-    // ----------------------------------------------------------------
-
-    // VM cost formula:
-    //   basePrice = 35 for 1 vCPU + ratio=1, BV, Linux, zero disk, zero GPU
-    //   perfClassFactor = 1 for BV, 1.5 for DP
-    //   totalCompute = basePrice * perfClassFactor * vcpus * memRatio
-    //   Windows surcharge = 150 * vcpus
-    //   disk cost = (diskSize / 10) * 8
-    //   GPU cost = 5110 * gpus
-    //   => total for 1 instance => sum all above
-    //   => multiply by quantity
-    function calculateVMCost(perfClass, memRatio, vcpus, os, diskSize, gpuCount, quantity) {
+    // Cost formula for VM:
+    // basePrice = 35 for 1 vCPU, memRatio=1, BV, Linux, 0 disk, 0 GPU
+    // perfClassFactor = 1 for BV, 1.5 for DP
+    // totalComputeCost = basePrice * perfClassFactor * vcpus * memRatio
+    // Windows surcharge = 150 * vcpus
+    // disk cost = (diskSize / 10) * 8
+    // GPU cost = 5110 * numberOfGPUs
+    // Multiply final by quantity
+    function calculateVmCost(perfClass, memRatio, vcpus, os, diskSize, gpuCount, quantity) {
       const basePrice = 35;
       const perfClassFactor = (perfClass === 'BV') ? 1 : 1.5;
       const memoryRatioFactor = parseInt(memRatio, 10);
@@ -424,190 +368,501 @@
       const gpus = parseInt(gpuCount, 10);
       const qty = parseInt(quantity, 10);
 
-      // compute cost
       let computeCost = basePrice * perfClassFactor * numVcpus * memoryRatioFactor;
-      // windows surcharge
-      let osSurcharge = (os === 'Windows') ? 150 * numVcpus : 0;
-      // disk cost => R$8 per 10 GiB
+
+      let osSurcharge = 0;
+      if (os === 'Windows') {
+        osSurcharge = 150 * numVcpus;
+      }
+
       let diskCost = (numDiskGiB / 10) * 8;
-      // gpu cost
+
       let gpuCost = 5110 * gpus;
 
       let total = (computeCost + osSurcharge + diskCost + gpuCost) * qty;
       return total;
     }
 
-    // Object Storage cost formula:
-    //   If Standard => cost = R$0.10 * GiBs stored
-    //                  retrieval cost = 0
-    //   If ColdInstant => cost = R$0.06 * GiBs stored
-    //                     retrieval cost = R$0.10 * GiBs retrieved
-    //   Multiply total by quantity
-    function calculateStorageCost(storageClass, storedGiB, retrievedGiB, quantity) {
-      const qty = parseInt(quantity, 10);
-      const sGiB = parseInt(storedGiB, 10);
-      const rGiB = parseInt(retrievedGiB, 10);
+    // Arrays to hold items
+    let vmList = [];
 
-      let perGbStoragePrice = (storageClass === 'Standard') ? 0.10 : 0.06;
-      let perGbRetrieval = (storageClass === 'Standard') ? 0 : 0.10;
+    // DOM references
+    const vmPerfClassEl = document.getElementById('vmPerfClass');
+    const vmOsTypeEl = document.getElementById('vmOsType');
+    const vmMemoryRatioEl = document.getElementById('vmMemoryRatio');
+    const vmVcpusEl = document.getElementById('vmVcpus');
+    const vmLocalDiskEl = document.getElementById('vmLocalDisk');
+    const vmGpuEl = document.getElementById('vmGpu');
+    const vmGpuNoteEl = document.getElementById('vmGpuNote');
+    const vmQuantityEl = document.getElementById('vmQuantity');
+    const addVmBtn = document.getElementById('addVmBtn');
+    const vmTableBody = document.querySelector('#vmTable tbody');
+    const vmSubtotalEl = document.getElementById('vmSubtotal');
+    const vmTotalVcpusLabel = document.getElementById('vmTotalVcpusLabel');
+    const vmTotalRamLabel = document.getElementById('vmTotalRamLabel');
 
-      let total = ( (sGiB * perGbStoragePrice) + (rGiB * perGbRetrieval) ) * qty;
-      return total;
-    }
+    function updateVmForm() {
+      const perfClassVal = vmPerfClassEl.value;
+      const osVal = vmOsTypeEl.value;
 
-    // ----------------------------------------------------------------
-    // F) Adding a Resource & Rendering the Table
-    // ----------------------------------------------------------------
-    function addResource() {
-      const rType = resourceTypeEl.value;
-      const qty = parseInt(quantityEl.value, 10);
+      // Memory ratio
+      let ratios = (perfClassVal === 'BV') ? memoryRatiosBV : memoryRatiosDP;
+      vmMemoryRatioEl.innerHTML = '';
+      ratios.forEach(r => {
+        const opt = document.createElement('option');
+        opt.value = r;
+        opt.textContent = r;
+        vmMemoryRatioEl.appendChild(opt);
+      });
 
-      if (rType === 'VM') {
-        // gather VM fields
-        const perfClassVal = perfClassEl.value;
-        const osVal = osTypeEl.value;
-        const memRatioVal = memoryRatioEl.value;
-        const vcpusVal = vcpusEl.value;
-        const diskVal = localDiskEl.value;
-        const gpuVal = gpuEl.value;
+      // vCPUs
+      let vcpuOpts = (perfClassVal === 'BV') ? vcpusBV : vcpusDP;
+      vmVcpusEl.innerHTML = '';
+      vcpuOpts.forEach(v => {
+        const opt = document.createElement('option');
+        opt.value = v;
+        opt.textContent = v;
+        vmVcpusEl.appendChild(opt);
+      });
 
-        // cost
-        const subtotal = calculateVMCost(
-          perfClassVal, memRatioVal, vcpusVal, osVal, diskVal, gpuVal, qty
-        );
+      // Local Disk
+      let diskOpts = getLocalDiskOptions(perfClassVal, osVal);
+      vmLocalDiskEl.innerHTML = '';
+      diskOpts.forEach(d => {
+        const opt = document.createElement('option');
+        opt.value = d;
+        opt.textContent = d;
+        vmLocalDiskEl.appendChild(opt);
+      });
 
-        // details
-        const ramGB = parseInt(vcpusVal, 10) * parseInt(memRatioVal, 10);
-        const sku = [
-          'VM',
-          perfClassVal,
-          vcpusVal + 'vCPU',
-          ramGB + 'GB',
-          osVal,
-          diskVal + 'GiB',
-          gpuVal + 'GPU',
-        ].join('-');
-
-        instances.push({
-          resourceType: 'VM',
-          sku,
-          perfClass: perfClassVal,
-          vcpus: parseInt(vcpusVal, 10),
-          ramGB,
-          os: osVal,
-          disk: parseInt(diskVal, 10),
-          gpu: parseInt(gpuVal, 10),
-          quantity: qty,
-          cost: subtotal
-        });
-
-      } else {
-        // gather Storage fields
-        const sClass = storageClassEl.value;
-        const sGiB = parseInt(storageGiBEl.value, 10);
-        let rGiB = parseInt(retrievedGiBEl.value, 10);
-        // if Standard is selected, retrieval is 0
-        if (sClass === 'Standard') {
-          rGiB = 0;
-        }
-
-        const subtotal = calculateStorageCost(sClass, sGiB, rGiB, qty);
-        const sku = [
-          'ObjectStorage',
-          sClass,
-          sGiB + 'GB',
-          (sClass === 'ColdInstant' ? rGiB + 'GBRetrieved' : 'NoRetrieval'),
-        ].join('-');
-
-        instances.push({
-          resourceType: 'ObjectStorage',
-          sku,
-          storageClass: sClass,
-          storedGiB: sGiB,
-          retrievedGiB: rGiB,
-          quantity: qty,
-          cost: subtotal
-        });
+      // GPU logic
+      let disableGPU = false;
+      let note = '';
+      if (perfClassVal === 'DP') {
+        disableGPU = true;
+        note = 'GPU not available on this performance class';
+      } else if (osVal === 'Windows') {
+        disableGPU = true;
+        note = 'GPU not available with Windows';
       }
-
-      renderTable();
+      vmGpuEl.disabled = disableGPU;
+      if (disableGPU) {
+        vmGpuEl.value = '0';
+        vmGpuNoteEl.textContent = note;
+      } else {
+        vmGpuNoteEl.textContent = '';
+      }
     }
 
-    function renderTable() {
-      // clear existing rows
-      instancesTableBody.innerHTML = '';
+    vmPerfClassEl.addEventListener('change', updateVmForm);
+    vmOsTypeEl.addEventListener('change', updateVmForm);
 
-      let vmTotalCost = 0, vmTotalVcpus = 0, vmTotalRam = 0;
-      let storageTotalCost = 0, storageTotalGiB = 0, storageTotalRetrieved = 0;
-      let grandTotal = 0;
+    // On load
+    updateVmForm();
 
-      instances.forEach((inst, idx) => {
-        // create a row
+    function addVmItem() {
+      const perfClassVal = vmPerfClassEl.value;
+      const osVal = vmOsTypeEl.value;
+      const memRatioVal = vmMemoryRatioEl.value;
+      const vcpusVal = vmVcpusEl.value;
+      const diskVal = vmLocalDiskEl.value;
+      const gpuVal = vmGpuEl.value;
+      const qtyVal = vmQuantityEl.value;
+
+      const subtotal = calculateVmCost(
+        perfClassVal,
+        memRatioVal,
+        vcpusVal,
+        osVal,
+        diskVal,
+        gpuVal,
+        qtyVal
+      );
+
+      const ramGB = parseInt(memRatioVal, 10) * parseInt(vcpusVal, 10);
+      const sku = [
+        perfClassVal,
+        vcpusVal + 'vCPU',
+        ramGB + 'GB',
+        osVal,
+        diskVal + 'GiB',
+        gpuVal + 'GPU',
+        'Qty' + qtyVal
+      ].join('-');
+
+      vmList.push({
+        sku,
+        perfClass: perfClassVal,
+        vcpus: parseInt(vcpusVal, 10),
+        ramGB,
+        os: osVal,
+        disk: parseInt(diskVal, 10),
+        gpu: parseInt(gpuVal, 10),
+        quantity: parseInt(qtyVal, 10),
+        subtotal
+      });
+
+      renderVmTable();
+    }
+
+    function renderVmTable() {
+      vmTableBody.innerHTML = '';
+
+      let sumVcpus = 0;
+      let sumRam = 0;
+      let sumVmCost = 0;
+
+      vmList.forEach((item, idx) => {
         const tr = document.createElement('tr');
-
-        // Resource Type
-        const typeTd = document.createElement('td');
-        typeTd.textContent = inst.resourceType;
-        tr.appendChild(typeTd);
 
         // SKU
         const skuTd = document.createElement('td');
-        skuTd.textContent = inst.sku;
+        skuTd.textContent = item.sku;
         tr.appendChild(skuTd);
 
-        // Quantity
+        // Perf Class
+        const perfTd = document.createElement('td');
+        perfTd.textContent = item.perfClass;
+        tr.appendChild(perfTd);
+
+        // vCPUs
+        const vcpusTd = document.createElement('td');
+        vcpusTd.textContent = item.vcpus;
+        tr.appendChild(vcpusTd);
+
+        // RAM
+        const ramTd = document.createElement('td');
+        ramTd.textContent = item.ramGB;
+        tr.appendChild(ramTd);
+
+        // OS
+        const osTd = document.createElement('td');
+        osTd.textContent = item.os;
+        tr.appendChild(osTd);
+
+        // Disk
+        const diskTd = document.createElement('td');
+        diskTd.textContent = item.disk;
+        tr.appendChild(diskTd);
+
+        // GPU
+        const gpuTd = document.createElement('td');
+        gpuTd.textContent = item.gpu;
+        tr.appendChild(gpuTd);
+
+        // Qty
         const qtyTd = document.createElement('td');
-        qtyTd.textContent = inst.quantity;
+        qtyTd.textContent = item.quantity;
         tr.appendChild(qtyTd);
 
         // Subtotal
-        const costTd = document.createElement('td');
-        costTd.textContent = 'R$' + inst.cost.toFixed(2);
-        tr.appendChild(costTd);
+        const subtotalTd = document.createElement('td');
+        subtotalTd.textContent = 'R$' + item.subtotal.toFixed(2);
+        tr.appendChild(subtotalTd);
 
-        // Remove button
+        // Remove
         const removeTd = document.createElement('td');
         const removeBtn = document.createElement('button');
         removeBtn.textContent = 'X';
         removeBtn.addEventListener('click', () => {
-          instances.splice(idx, 1);
-          renderTable();
+          vmList.splice(idx, 1);
+          renderVmTable();
         });
         removeTd.appendChild(removeBtn);
         tr.appendChild(removeTd);
 
-        instancesTableBody.appendChild(tr);
+        vmTableBody.appendChild(tr);
 
-        // Now accumulate totals
-        grandTotal += inst.cost;
-
-        if (inst.resourceType === 'VM') {
-          vmTotalCost += inst.cost;
-          vmTotalVcpus += (inst.vcpus * inst.quantity);
-          vmTotalRam += (inst.ramGB * inst.quantity);
-        } else if (inst.resourceType === 'ObjectStorage') {
-          storageTotalCost += inst.cost;
-          storageTotalGiB += (inst.storedGiB * inst.quantity);
-          if (inst.storageClass === 'ColdInstant') {
-            storageTotalRetrieved += (inst.retrievedGiB * inst.quantity);
-          }
-        }
+        // Accumulate
+        sumVmCost += item.subtotal;
+        sumVcpus += (item.vcpus * item.quantity);
+        sumRam += (item.ramGB * item.quantity);
       });
 
+      vmSubtotalEl.textContent = 'R$' + sumVmCost.toFixed(2);
+      vmTotalVcpusLabel.textContent = 'Total vCPUs: ' + sumVcpus;
+      vmTotalRamLabel.textContent = 'Total RAM (GB): ' + sumRam;
+
       // Update summary
-      vmTotalVcpusEl.textContent = vmTotalVcpus;
-      vmTotalRamEl.textContent = vmTotalRam;
-      vmTotalCostEl.textContent = 'R$' + vmTotalCost.toFixed(2);
-
-      storageTotalGiBEl.textContent = storageTotalGiB;
-      storageTotalRetrievedEl.textContent = storageTotalRetrieved;
-      storageTotalCostEl.textContent = 'R$' + storageTotalCost.toFixed(2);
-
-      grandTotalCostEl.textContent = 'R$' + grandTotal.toFixed(2);
+      updateSummary();
     }
 
-    addResourceBtn.addEventListener('click', addResource);
+    addVmBtn.addEventListener('click', addVmItem);
 
+    // ---------------------------------------------------------
+    //   2) Data and Utility for Object Storage
+    // ---------------------------------------------------------
+    let objectStorageList = [];
+
+    const osClassEl = document.getElementById('osClass');
+    const osGiBsEl = document.getElementById('osGiBs');
+    const osGiBsRetrievedEl = document.getElementById('osGiBsRetrieved');
+    const addObjectStorageBtn = document.getElementById('addObjectStorageBtn');
+    const objectStorageTableBody = document.querySelector('#objectStorageTable tbody');
+    const objectStorageSubtotalEl = document.getElementById('objectStorageSubtotal');
+
+    // Pricing:
+    // Standard: 0.10 R$/GB stored, no retrieval cost
+    // Cold Instant: 0.06 R$/GB stored + 0.10 R$/GB retrieved
+    function calculateObjectStorageCost(storageClass, giBs, giBsRetrieved) {
+      let cost = 0;
+      const stored = parseFloat(giBs);
+      const retrieved = parseFloat(giBsRetrieved);
+
+      if (storageClass === 'Standard') {
+        cost = stored * 0.10; 
+        // retrieval cost = 0
+      } else {
+        // Cold Instant
+        cost = stored * 0.06 + retrieved * 0.10;
+      }
+      return cost;
+    }
+
+    // Hide "GiBs Retrieved" if Standard is selected
+    osClassEl.addEventListener('change', () => {
+      if (osClassEl.value === 'Standard') {
+        osGiBsRetrievedEl.value = '0'; // or you can keep default=100, but no effect on cost
+        osGiBsRetrievedEl.disabled = true;
+      } else {
+        osGiBsRetrievedEl.disabled = false;
+      }
+    });
+    // Initialize
+    if (osClassEl.value === 'Standard') osGiBsRetrievedEl.disabled = true;
+
+    function addObjectStorageItem() {
+      const sc = osClassEl.value;
+      const giBsVal = osGiBsEl.value;
+      const retrievedVal = osGiBsRetrievedEl.value;
+
+      const subtotal = calculateObjectStorageCost(sc, giBsVal, retrievedVal);
+
+      const sku = [
+        sc,
+        giBsVal + 'GiBs',
+        (sc === 'ColdInstant') ? (retrievedVal + 'Retrieved') : 'NoRetrieval'
+      ].join('-');
+
+      objectStorageList.push({
+        sku,
+        storageClass: sc,
+        giBs: parseInt(giBsVal, 10),
+        giBsRetrieved: parseInt(retrievedVal, 10),
+        subtotal
+      });
+
+      renderObjectStorageTable();
+    }
+
+    function renderObjectStorageTable() {
+      objectStorageTableBody.innerHTML = '';
+      let sumCost = 0;
+
+      objectStorageList.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+
+        // SKU
+        const skuTd = document.createElement('td');
+        skuTd.textContent = item.sku;
+        tr.appendChild(skuTd);
+
+        // Class
+        const classTd = document.createElement('td');
+        classTd.textContent = item.storageClass;
+        tr.appendChild(classTd);
+
+        // GiBs
+        const giBsTd = document.createElement('td');
+        giBsTd.textContent = item.giBs;
+        tr.appendChild(giBsTd);
+
+        // GiBs Retrieved
+        const retrievedTd = document.createElement('td');
+        retrievedTd.textContent = (item.storageClass === 'ColdInstant') 
+          ? item.giBsRetrieved
+          : 0;
+        tr.appendChild(retrievedTd);
+
+        // Subtotal
+        const subtotalTd = document.createElement('td');
+        subtotalTd.textContent = 'R$' + item.subtotal.toFixed(2);
+        tr.appendChild(subtotalTd);
+
+        // Remove
+        const removeTd = document.createElement('td');
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'X';
+        removeBtn.addEventListener('click', () => {
+          objectStorageList.splice(idx, 1);
+          renderObjectStorageTable();
+        });
+        removeTd.appendChild(removeBtn);
+        tr.appendChild(removeTd);
+
+        objectStorageTableBody.appendChild(tr);
+
+        // accumulate
+        sumCost += item.subtotal;
+      });
+
+      objectStorageSubtotalEl.textContent = 'R$' + sumCost.toFixed(2);
+
+      // Update summary
+      updateSummary();
+    }
+
+    addObjectStorageBtn.addEventListener('click', addObjectStorageItem);
+
+    // ---------------------------------------------------------
+    //   3) Data and Utility for Block Storage Volumes
+    // ---------------------------------------------------------
+    let blockStorageList = [];
+
+    const bsIopsEl = document.getElementById('bsIops');
+    const bsVolumeSizeEl = document.getElementById('bsVolumeSize');
+    const bsQuantityEl = document.getElementById('bsQuantity');
+    const addBlockStorageBtn = document.getElementById('addBlockStorageBtn');
+    const blockStorageTableBody = document.querySelector('#blockStorageTable tbody');
+    const blockStorageSubtotalEl = document.getElementById('blockStorageSubtotal');
+
+    // Pricing per GiB depends on IOPS:
+    // 1000 => 0.58
+    // 5000 => 0.65
+    // 10000 => 0.73
+    // 15000 => 0.81
+    // 20000 => 0.89
+    function getBlockStoragePrice(iops) {
+      const num = parseInt(iops, 10);
+      if (num === 1000) return 0.58;
+      if (num === 5000) return 0.65;
+      if (num === 10000) return 0.73;
+      if (num === 15000) return 0.81;
+      if (num === 20000) return 0.89;
+      return 0.58; // default
+    }
+
+    function calculateBlockStorageCost(iops, volumeSize, quantity) {
+      const costPerGiB = getBlockStoragePrice(iops);
+      const size = parseFloat(volumeSize);
+      const qty = parseInt(quantity, 10);
+
+      // total = (costPerGiB * volumeSize) * quantity
+      return costPerGiB * size * qty;
+    }
+
+    function addBlockStorageItem() {
+      const iopsVal = bsIopsEl.value;
+      const sizeVal = bsVolumeSizeEl.value;
+      const qtyVal = bsQuantityEl.value;
+
+      const subtotal = calculateBlockStorageCost(iopsVal, sizeVal, qtyVal);
+      const sku = [
+        'NVMeStd', 
+        iopsVal + 'IOPS', 
+        sizeVal + 'GiB', 
+        'Qty' + qtyVal
+      ].join('-');
+
+      blockStorageList.push({
+        sku,
+        iops: parseInt(iopsVal, 10),
+        volumeSize: parseInt(sizeVal, 10),
+        quantity: parseInt(qtyVal, 10),
+        subtotal
+      });
+
+      renderBlockStorageTable();
+    }
+
+    function renderBlockStorageTable() {
+      blockStorageTableBody.innerHTML = '';
+      let sumCost = 0;
+
+      blockStorageList.forEach((item, idx) => {
+        const tr = document.createElement('tr');
+
+        // SKU
+        const skuTd = document.createElement('td');
+        skuTd.textContent = item.sku;
+        tr.appendChild(skuTd);
+
+        // IOPS
+        const iopsTd = document.createElement('td');
+        iopsTd.textContent = item.iops;
+        tr.appendChild(iopsTd);
+
+        // Size
+        const sizeTd = document.createElement('td');
+        sizeTd.textContent = item.volumeSize;
+        tr.appendChild(sizeTd);
+
+        // Quantity
+        const qtyTd = document.createElement('td');
+        qtyTd.textContent = item.quantity;
+        tr.appendChild(qtyTd);
+
+        // Subtotal
+        const subtotalTd = document.createElement('td');
+        subtotalTd.textContent = 'R$' + item.subtotal.toFixed(2);
+        tr.appendChild(subtotalTd);
+
+        // Remove
+        const removeTd = document.createElement('td');
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'X';
+        removeBtn.addEventListener('click', () => {
+          blockStorageList.splice(idx, 1);
+          renderBlockStorageTable();
+        });
+        removeTd.appendChild(removeBtn);
+        tr.appendChild(removeTd);
+
+        blockStorageTableBody.appendChild(tr);
+
+        sumCost += item.subtotal;
+      });
+
+      blockStorageSubtotalEl.textContent = 'R$' + sumCost.toFixed(2);
+
+      // Update summary
+      updateSummary();
+    }
+
+    addBlockStorageBtn.addEventListener('click', addBlockStorageItem);
+
+    // ---------------------------------------------------------
+    //   4) Summary Calculation
+    // ---------------------------------------------------------
+    const summaryVmSubtotalEl = document.getElementById('summaryVmSubtotal');
+    const summaryObjectSubtotalEl = document.getElementById('summaryObjectSubtotal');
+    const summaryBlockSubtotalEl = document.getElementById('summaryBlockSubtotal');
+    const overallTotalEl = document.getElementById('overallTotal');
+
+    function updateSummary() {
+      // Sum up the subtotals from each table
+      // (We can parse from text or re-accumulate within each list.)
+      const vmCost = getVmTotal();
+      const objectCost = getObjectStorageTotal();
+      const blockCost = getBlockStorageTotal();
+      const overall = vmCost + objectCost + blockCost;
+
+      // Update summary fields
+      summaryVmSubtotalEl.textContent = 'R$' + vmCost.toFixed(2);
+      summaryObjectSubtotalEl.textContent = 'R$' + objectCost.toFixed(2);
+      summaryBlockSubtotalEl.textContent = 'R$' + blockCost.toFixed(2);
+      overallTotalEl.textContent = 'R$' + overall.toFixed(2);
+    }
+
+    function getVmTotal() {
+      return vmList.reduce((acc, item) => acc + item.subtotal, 0);
+    }
+    function getObjectStorageTotal() {
+      return objectStorageList.reduce((acc, item) => acc + item.subtotal, 0);
+    }
+    function getBlockStorageTotal() {
+      return blockStorageList.reduce((acc, item) => acc + item.subtotal, 0);
+    }
   </script>
 </body>
 </html>
