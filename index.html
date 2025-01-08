@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Cloud Resource Pricing Calculator MVP</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+    }
+    label {
+      display: inline-block;
+      width: 180px;
+      margin-bottom: 8px;
+    }
+    input, select {
+      margin-bottom: 8px;
+    }
+    .field {
+      margin-bottom: 16px;
+    }
+    .button {
+      margin-bottom: 20px;
+    }
+    #totalCost {
+      font-weight: bold;
+      color: #2c3e50;
+    }
+  </style>
+</head>
+<body>
+  <h1>Cloud Resource Pricing Calculator (MVP)</h1>
+
+  <!-- Resource Type -->
+  <div class="field">
+    <label for="resource">Select Resource Type:</label>
+    <select id="resource">
+      <!-- Hard-coded hourly rates for demonstration -->
+      <option value="0.50">Small (R$0.50/hour)</option>
+      <option value="1.00">Medium (R$1.00/hour)</option>
+      <option value="2.00">Large (R$2.00/hour)</option>
+    </select>
+  </div>
+
+  <!-- Usage Hours -->
+  <div class="field">
+    <label for="hours">Usage Hours per Month:</label>
+    <input type="number" id="hours" value="720" />
+  </div>
+
+  <!-- Quantity -->
+  <div class="field">
+    <label for="quantity">Number of Instances:</label>
+    <input type="number" id="quantity" value="1" />
+  </div>
+
+  <!-- Calculate Button -->
+  <div class="field button">
+    <button id="calculateBtn">Calculate</button>
+  </div>
+
+  <!-- Display Result -->
+  <h2>Total Monthly Cost: <span id="totalCost">R$0.00</span></h2>
+
+  <script>
+    // A simple click handler for "Calculate" 
+    document.getElementById('calculateBtn').addEventListener('click', function() {
+      const resourceRate = parseFloat(document.getElementById('resource').value);
+      const hours = parseFloat(document.getElementById('hours').value);
+      const quantity = parseFloat(document.getElementById('quantity').value);
+
+      // Basic calculation: rate * hours * quantity
+      const total = resourceRate * hours * quantity;
+
+      // Display total with two decimal places
+      document.getElementById('totalCost').textContent = 'R$' + total.toFixed(2);
+    });
+  </script>
+</body>
+</html>
