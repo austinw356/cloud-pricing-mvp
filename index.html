@@ -192,11 +192,18 @@
       <!-- VM rows here -->
     </tbody>
     <tfoot>
+      <!-- We will create a single row that totals all numeric columns:
+           vCPUs, RAM, Disk, GPU, Qty, Subtotal. -->
       <tr>
-        <td colspan="2" id="vmTotalVcpusLabel">Total vCPUs: 0</td>
-        <td colspan="2" id="vmTotalRamLabel">Total RAM (GB): 0</td>
-        <td colspan="3" style="text-align:right;">VM Subtotal:</td>
-        <td colspan="2" id="vmSubtotal">R$0.00</td>
+        <!-- First two columns can be a label: -->
+        <td colspan="2">Totals</td>
+        <td id="vmSumVcpus">0</td>
+        <td id="vmSumRam">0</td>
+        <td><!-- OS not summed --></td>
+        <td id="vmSumDisk">0</td>
+        <td id="vmSumGpu">0</td>
+        <td id="vmSumQty">0</td>
+        <td id="vmSumSubtotal">R$0.00</td>
         <td></td>
       </tr>
     </tfoot>
@@ -245,9 +252,12 @@
       <!-- Object Storage rows here -->
     </tbody>
     <tfoot>
+      <!-- We sum "GiBs Stored," "GiBs Retrieved," and the Subtotal. -->
       <tr>
-        <td colspan="4" style="text-align:right;">Object Storage Subtotal:</td>
-        <td id="objectStorageSubtotal">R$0.00</td>
+        <td colspan="2">Totals</td>
+        <td id="osSumStored">0</td>
+        <td id="osSumRetrieved">0</td>
+        <td id="osSumSubtotal">R$0.00</td>
         <td></td>
       </tr>
     </tfoot>
@@ -306,9 +316,15 @@
       <!-- Block Storage rows here -->
     </tbody>
     <tfoot>
+      <!-- Summation of IOPS? Possibly not meaningful to sum across different IOPS options,
+           but we'll do it if you want "sum all numeric fields".
+           We'll definitely sum Size, Quantity, and Subtotal. -->
       <tr>
-        <td colspan="4" style="text-align:right;">Block Storage Subtotal:</td>
-        <td id="blockStorageSubtotal">R$0.00</td>
+        <td>Totals</td>
+        <td id="bsSumIops">0</td>
+        <td id="bsSumSize">0</td>
+        <td id="bsSumQty">0</td>
+        <td id="bsSumSubtotal">R$0.00</td>
         <td></td>
       </tr>
     </tfoot>
@@ -397,9 +413,14 @@
     const vmQuantityEl = document.getElementById('vmQuantity');
     const addVmBtn = document.getElementById('addVmBtn');
     const vmTableBody = document.querySelector('#vmTable tbody');
-    const vmSubtotalEl = document.getElementById('vmSubtotal');
-    const vmTotalVcpusLabel = document.getElementById('vmTotalVcpusLabel');
-    const vmTotalRamLabel = document.getElementById('vmTotalRamLabel');
+
+    // Footer fields for sums
+    const vmSumVcpusEl = document.getElementById('vmSumVcpus');
+    const vmSumRamEl = document.getElementById('vmSumRam');
+    const vmSumDiskEl = document.getElementById('vmSumDisk');
+    const vmSumGpuEl = document.getElementById('vmSumGpu');
+    const vmSumQtyEl = document.getElementById('vmSumQty');
+    const vmSumSubtotalEl = document.getElementById('vmSumSubtotal');
 
     function updateVmForm() {
       const perfClassVal = vmPerfClassEl.value;
@@ -510,6 +531,9 @@
 
       let sumVcpus = 0;
       let sumRam = 0;
+      let sumDisk = 0;
+      let sumGpu = 0;
+      let sumQty = 0;
       let sumVmCost = 0;
 
       vmList.forEach((item, idx) => {
@@ -574,14 +598,20 @@
         vmTableBody.appendChild(tr);
 
         // Accumulate
+        sumVcpus += item.vcpus * item.quantity;
+        sumRam += item.ramGB * item.quantity;
+        sumDisk += item.disk * item.quantity;
+        sumGpu += item.gpu * item.quantity;
+        sumQty += item.quantity;
         sumVmCost += item.subtotal;
-        sumVcpus += (item.vcpus * item.quantity);
-        sumRam += (item.ramGB * item.quantity);
       });
 
-      vmSubtotalEl.textContent = 'R$' + sumVmCost.toFixed(2);
-      vmTotalVcpusLabel.textContent = 'Total vCPUs: ' + sumVcpus;
-      vmTotalRamLabel.textContent = 'Total RAM (GB): ' + sumRam;
+      vmSumVcpusEl.textContent = sumVcpus;
+      vmSumRamEl.textContent = sumRam;
+      vmSumDiskEl.textContent = sumDisk;
+      vmSumGpuEl.textContent = sumGpu;
+      vmSumQtyEl.textContent = sumQty;
+      vmSumSubtotalEl.textContent = 'R$' + sumVmCost.toFixed(2);
 
       // Update summary
       updateSummary();
@@ -599,7 +629,11 @@
     const osGiBsRetrievedEl = document.getElementById('osGiBsRetrieved');
     const addObjectStorageBtn = document.getElementById('addObjectStorageBtn');
     const objectStorageTableBody = document.querySelector('#objectStorageTable tbody');
-    const objectStorageSubtotalEl = document.getElementById('objectStorageSubtotal');
+
+    // Footer elements
+    const osSumStoredEl = document.getElementById('osSumStored');
+    const osSumRetrievedEl = document.getElementById('osSumRetrieved');
+    const osSumSubtotalEl = document.getElementById('osSumSubtotal');
 
     // Pricing:
     // Standard: 0.10 R$/GB stored, no retrieval cost
@@ -611,7 +645,6 @@
 
       if (storageClass === 'Standard') {
         cost = stored * 0.10; 
-        // retrieval cost = 0
       } else {
         // Cold Instant
         cost = stored * 0.06 + retrieved * 0.10;
@@ -622,7 +655,7 @@
     // Hide "GiBs Retrieved" if Standard is selected
     osClassEl.addEventListener('change', () => {
       if (osClassEl.value === 'Standard') {
-        osGiBsRetrievedEl.value = '0'; // or you can keep default=100, but no effect on cost
+        osGiBsRetrievedEl.value = '0';
         osGiBsRetrievedEl.disabled = true;
       } else {
         osGiBsRetrievedEl.disabled = false;
@@ -657,6 +690,8 @@
 
     function renderObjectStorageTable() {
       objectStorageTableBody.innerHTML = '';
+      let sumStored = 0;
+      let sumRetrieved = 0;
       let sumCost = 0;
 
       objectStorageList.forEach((item, idx) => {
@@ -672,16 +707,18 @@
         classTd.textContent = item.storageClass;
         tr.appendChild(classTd);
 
-        // GiBs
+        // GiBs Stored
         const giBsTd = document.createElement('td');
         giBsTd.textContent = item.giBs;
         tr.appendChild(giBsTd);
 
         // GiBs Retrieved
         const retrievedTd = document.createElement('td');
-        retrievedTd.textContent = (item.storageClass === 'ColdInstant') 
-          ? item.giBsRetrieved
-          : 0;
+        if (item.storageClass === 'ColdInstant') {
+          retrievedTd.textContent = item.giBsRetrieved;
+        } else {
+          retrievedTd.textContent = '0';
+        }
         tr.appendChild(retrievedTd);
 
         // Subtotal
@@ -702,13 +739,16 @@
 
         objectStorageTableBody.appendChild(tr);
 
-        // accumulate
+        // Accumulate
+        sumStored += item.giBs;
+        sumRetrieved += item.storageClass === 'ColdInstant' ? item.giBsRetrieved : 0;
         sumCost += item.subtotal;
       });
 
-      objectStorageSubtotalEl.textContent = 'R$' + sumCost.toFixed(2);
+      osSumStoredEl.textContent = sumStored;
+      osSumRetrievedEl.textContent = sumRetrieved;
+      osSumSubtotalEl.textContent = 'R$' + sumCost.toFixed(2);
 
-      // Update summary
       updateSummary();
     }
 
@@ -724,7 +764,12 @@
     const bsQuantityEl = document.getElementById('bsQuantity');
     const addBlockStorageBtn = document.getElementById('addBlockStorageBtn');
     const blockStorageTableBody = document.querySelector('#blockStorageTable tbody');
-    const blockStorageSubtotalEl = document.getElementById('blockStorageSubtotal');
+
+    // Footer elements
+    const bsSumIopsEl = document.getElementById('bsSumIops');
+    const bsSumSizeEl = document.getElementById('bsSumSize');
+    const bsSumQtyEl = document.getElementById('bsSumQty');
+    const bsSumSubtotalEl = document.getElementById('bsSumSubtotal');
 
     // Pricing per GiB depends on IOPS:
     // 1000 => 0.58
@@ -739,15 +784,13 @@
       if (num === 10000) return 0.73;
       if (num === 15000) return 0.81;
       if (num === 20000) return 0.89;
-      return 0.58; // default
+      return 0.58; // fallback
     }
 
     function calculateBlockStorageCost(iops, volumeSize, quantity) {
       const costPerGiB = getBlockStoragePrice(iops);
       const size = parseFloat(volumeSize);
       const qty = parseInt(quantity, 10);
-
-      // total = (costPerGiB * volumeSize) * quantity
       return costPerGiB * size * qty;
     }
 
@@ -767,7 +810,7 @@
       blockStorageList.push({
         sku,
         iops: parseInt(iopsVal, 10),
-        volumeSize: parseInt(sizeVal, 10),
+        size: parseInt(sizeVal, 10),
         quantity: parseInt(qtyVal, 10),
         subtotal
       });
@@ -777,6 +820,9 @@
 
     function renderBlockStorageTable() {
       blockStorageTableBody.innerHTML = '';
+      let sumIops = 0; // Summing IOPS can be questionable, but done per your request
+      let sumSize = 0;
+      let sumQty = 0;
       let sumCost = 0;
 
       blockStorageList.forEach((item, idx) => {
@@ -794,7 +840,7 @@
 
         // Size
         const sizeTd = document.createElement('td');
-        sizeTd.textContent = item.volumeSize;
+        sizeTd.textContent = item.size;
         tr.appendChild(sizeTd);
 
         // Quantity
@@ -820,12 +866,18 @@
 
         blockStorageTableBody.appendChild(tr);
 
+        // Accumulate
+        sumIops += item.iops; 
+        sumSize += (item.size * item.quantity);
+        sumQty += item.quantity;
         sumCost += item.subtotal;
       });
 
-      blockStorageSubtotalEl.textContent = 'R$' + sumCost.toFixed(2);
+      bsSumIopsEl.textContent = sumIops;
+      bsSumSizeEl.textContent = sumSize;
+      bsSumQtyEl.textContent = sumQty;
+      bsSumSubtotalEl.textContent = 'R$' + sumCost.toFixed(2);
 
-      // Update summary
       updateSummary();
     }
 
@@ -840,28 +892,15 @@
     const overallTotalEl = document.getElementById('overallTotal');
 
     function updateSummary() {
-      // Sum up the subtotals from each table
-      // (We can parse from text or re-accumulate within each list.)
-      const vmCost = getVmTotal();
-      const objectCost = getObjectStorageTotal();
-      const blockCost = getBlockStorageTotal();
+      const vmCost = vmList.reduce((acc, item) => acc + item.subtotal, 0);
+      const objectCost = objectStorageList.reduce((acc, item) => acc + item.subtotal, 0);
+      const blockCost = blockStorageList.reduce((acc, item) => acc + item.subtotal, 0);
       const overall = vmCost + objectCost + blockCost;
 
-      // Update summary fields
       summaryVmSubtotalEl.textContent = 'R$' + vmCost.toFixed(2);
       summaryObjectSubtotalEl.textContent = 'R$' + objectCost.toFixed(2);
       summaryBlockSubtotalEl.textContent = 'R$' + blockCost.toFixed(2);
       overallTotalEl.textContent = 'R$' + overall.toFixed(2);
-    }
-
-    function getVmTotal() {
-      return vmList.reduce((acc, item) => acc + item.subtotal, 0);
-    }
-    function getObjectStorageTotal() {
-      return objectStorageList.reduce((acc, item) => acc + item.subtotal, 0);
-    }
-    function getBlockStorageTotal() {
-      return blockStorageList.reduce((acc, item) => acc + item.subtotal, 0);
     }
   </script>
 </body>
