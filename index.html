@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Magalu Cloud Pricing Calculator (Test)</title>
+  <title>Magalu Cloud Pricing Calculator</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -11,24 +11,39 @@
       background: #f4f4f4;
       padding: 20px;
     }
+
     h1 {
       margin-top: 0;
     }
-    .section-title {
-      margin-top: 40px;
+    .disclaimer {
+      font-size: 0.9em;
+      color: #555;
+      margin-bottom: 20px;
+    }
+    
+    /* BOXED SECTION for each resource type */
+    .resource-section {
+      background: #fff;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      margin-bottom: 40px;
+      padding: 20px;
+    }
+    .resource-section h2 {
+      margin-top: 0;
       margin-bottom: 8px;
       font-size: 1.3em;
       color: #333;
     }
-    .card {
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      padding: 20px;
-      margin-bottom: 20px;
+
+    .section-form {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
     }
     .field {
       margin-bottom: 16px;
+      min-width: 300px;
     }
     label {
       display: inline-block;
@@ -37,9 +52,17 @@
       margin-bottom: 6px;
     }
     select, input[type="number"] {
-      min-width: 150px;
+      min-width: 100px;
       padding: 4px;
     }
+
+    .price-display {
+      margin-top: 6px;
+      font-weight: bold;
+      font-size: 1em;
+      color: #007bff;
+    }
+
     button {
       margin-top: 8px;
       padding: 6px 12px;
@@ -52,10 +75,7 @@
     button:hover {
       background: #0056b3;
     }
-    .disabled {
-      background-color: #ccc !important;
-      cursor: not-allowed;
-    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -80,6 +100,7 @@
       font-weight: bold;
       background: #f0f0f0;
     }
+
     .summary-section {
       background: #fff;
       border: 1px solid #ddd;
@@ -92,16 +113,11 @@
       font-weight: bold;
       font-size: 1.1em;
     }
-    .disclaimer {
-      font-size: 0.9em;
-      color: #555;
-      margin-bottom: 20px;
-    }
   </style>
 </head>
 <body>
 
-  <h1>Magalu Cloud Pricing Calculator (Test)</h1>
+  <h1>Magalu Cloud Pricing Calculator</h1>
   <p class="disclaimer">
     Prices shown are monthly estimates (billed by the second). Taxes included.
   </p>
@@ -109,226 +125,225 @@
   <!-- ************************************************** -->
   <!--                VIRTUAL MACHINES                   -->
   <!-- ************************************************** -->
-  <div class="card">
-    <h2 class="section-title">Add Virtual Machines</h2>
+  <div class="resource-section">
+    <h2>Virtual Machines</h2>
 
-    <div class="field">
-      <label>Resource Type:</label>
-      <input type="text" value="Virtual Machines" disabled />
+    <div class="section-form">
+      <div class="field">
+        <label for="vmPerfClass">Performance Class:</label>
+        <select id="vmPerfClass">
+          <option value="BV">Balanced Value (BV)</option>
+          <option value="DP">Dedicated Performance (DP)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="vmOsType">OS Type:</label>
+        <select id="vmOsType">
+          <option value="Linux">Linux</option>
+          <option value="Windows">Windows (+R$150/vCPU)</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="vmMemoryRatio">Memory Ratio (RAM / vCPU):</label>
+        <select id="vmMemoryRatio">
+          <!-- updated dynamically -->
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="vmVcpus">VM Size (# of vCPUs):</label>
+        <select id="vmVcpus">
+          <!-- updated dynamically -->
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="vmLocalDisk">Local Disk Size (GiB):</label>
+        <select id="vmLocalDisk">
+          <!-- updated dynamically -->
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="vmGpu">Optional GPU:</label>
+        <select id="vmGpu">
+          <option value="0">No GPU</option>
+          <option value="1">1x Nvidia L40 (+R$5110)</option>
+          <option value="2">2x Nvidia L40 (+R$10220)</option>
+        </select>
+        <span id="vmGpuNote" style="color: #d00; margin-left: 10px;"></span>
+      </div>
+
+      <div class="field">
+        <label for="vmQuantity">Quantity of Instances:</label>
+        <input type="number" id="vmQuantity" value="1" min="1" />
+      </div>
     </div>
 
-    <div class="field">
-      <label for="vmPerfClass">Performance Class:</label>
-      <select id="vmPerfClass">
-        <option value="BV">Balanced Value (BV)</option>
-        <option value="DP">Dedicated Performance (DP)</option>
-      </select>
-    </div>
-
-    <div class="field">
-      <label for="vmOsType">OS Type:</label>
-      <select id="vmOsType">
-        <option value="Linux">Linux</option>
-        <option value="Windows">Windows (+R$150/vCPU)</option>
-      </select>
-    </div>
-
-    <div class="field">
-      <label for="vmMemoryRatio">Memory Ratio (RAM / vCPU):</label>
-      <select id="vmMemoryRatio">
-        <!-- Will be updated dynamically -->
-      </select>
-    </div>
-
-    <div class="field">
-      <label for="vmVcpus">VM Size (# of vCPUs):</label>
-      <select id="vmVcpus">
-        <!-- Will be updated dynamically -->
-      </select>
-    </div>
-
-    <div class="field">
-      <label for="vmLocalDisk">Local Disk Size (GiB):</label>
-      <select id="vmLocalDisk">
-        <!-- Will be updated dynamically -->
-      </select>
-    </div>
-
-    <div class="field">
-      <label for="vmGpu">Optional GPU:</label>
-      <select id="vmGpu">
-        <option value="0">No GPU</option>
-        <option value="1">1x Nvidia L40 (+R$5110)</option>
-        <option value="2">2x Nvidia L40 (+R$10220)</option>
-      </select>
-      <span id="vmGpuNote" style="color: #d00; margin-left: 10px;"></span>
-    </div>
-
-    <div class="field">
-      <label for="vmQuantity">Quantity of Instances:</label>
-      <input type="number" id="vmQuantity" value="1" min="1" />
-    </div>
+    <!-- Display Price per Instance -->
+    <div id="vmPricePerInstance" class="price-display">Price per Instance: R$0.00</div>
 
     <button id="addVmBtn">Add VM Configuration</button>
-  </div>
 
-  <!-- VM Table -->
-  <table id="vmTable">
-    <thead>
-      <tr>
-        <th>SKU</th>
-        <th>Perf Class</th>
-        <th>vCPUs</th>
-        <th>RAM (GB)</th>
-        <th>OS</th>
-        <th>Disk (GiB)</th>
-        <th>GPU(s)</th>
-        <th>Qty</th>
-        <th>Subtotal (R$)</th>
-        <th>Remove</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- VM rows here -->
-    </tbody>
-    <tfoot>
-      <!-- We will create a single row that totals all numeric columns:
-           vCPUs, RAM, Disk, GPU, Qty, Subtotal. -->
-      <tr>
-        <!-- First two columns can be a label: -->
-        <td colspan="2">Totals</td>
-        <td id="vmSumVcpus">0</td>
-        <td id="vmSumRam">0</td>
-        <td><!-- OS not summed --></td>
-        <td id="vmSumDisk">0</td>
-        <td id="vmSumGpu">0</td>
-        <td id="vmSumQty">0</td>
-        <td id="vmSumSubtotal">R$0.00</td>
-        <td></td>
-      </tr>
-    </tfoot>
-  </table>
+    <!-- VM Table -->
+    <table id="vmTable">
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Perf Class</th>
+          <th>vCPUs</th>
+          <th>RAM (GB)</th>
+          <th>OS</th>
+          <th>Disk (GiB)</th>
+          <th>GPU(s)</th>
+          <th>Qty</th>
+          <th>Subtotal (R$)</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- VM rows here -->
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2">Totals</td>
+          <td id="vmSumVcpus">0</td>
+          <td id="vmSumRam">0</td>
+          <td></td>
+          <td id="vmSumDisk">0</td>
+          <td id="vmSumGpu">0</td>
+          <td id="vmSumQty">0</td>
+          <td id="vmSumSubtotal">R$0.00</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 
   <!-- ************************************************** -->
   <!--                OBJECT STORAGE                     -->
   <!-- ************************************************** -->
-  <div class="card">
-    <h2 class="section-title">Add Object Storage</h2>
+  <div class="resource-section">
+    <h2>Object Storage</h2>
 
-    <div class="field">
-      <label for="osClass">Storage Class:</label>
-      <select id="osClass">
-        <option value="Standard">Standard</option>
-        <option value="ColdInstant">Cold Instant</option>
-      </select>
-    </div>
+    <div class="section-form">
+      <div class="field">
+        <label for="osClass">Storage Class:</label>
+        <select id="osClass">
+          <option value="Standard">Standard</option>
+          <option value="ColdInstant">Cold Instant</option>
+        </select>
+        <!-- Unit price note -->
+        <div id="osUnitPrice" class="price-display"></div>
+      </div>
 
-    <div class="field">
-      <label for="osGiBs"># of GiBs (Storage):</label>
-      <input type="number" id="osGiBs" value="500" min="1" />
-    </div>
+      <div class="field">
+        <label for="osGiBs"># of GiBs (Storage):</label>
+        <input type="number" id="osGiBs" value="500" min="1" />
+      </div>
 
-    <div class="field">
-      <label for="osGiBsRetrieved">GiBs Retrieved per Month:</label>
-      <input type="number" id="osGiBsRetrieved" value="100" min="0" />
+      <div class="field">
+        <label for="osGiBsRetrieved">GiBs Retrieved per Month:</label>
+        <input type="number" id="osGiBsRetrieved" value="100" min="0" />
+      </div>
     </div>
 
     <button id="addObjectStorageBtn">Add Object Storage</button>
+
+    <!-- Object Storage Table -->
+    <table id="objectStorageTable">
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Class</th>
+          <th>GiBs Stored</th>
+          <th>GiBs Retrieved</th>
+          <th>Subtotal (R$)</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Object Storage rows here -->
+      </tbody>
+      <tfoot>
+        <tr>
+          <td colspan="2">Totals</td>
+          <td id="osSumStored">0</td>
+          <td id="osSumRetrieved">0</td>
+          <td id="osSumSubtotal">R$0.00</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
   </div>
-
-  <!-- Object Storage Table -->
-  <table id="objectStorageTable">
-    <thead>
-      <tr>
-        <th>SKU</th>
-        <th>Class</th>
-        <th>GiBs Stored</th>
-        <th>GiBs Retrieved</th>
-        <th>Subtotal (R$)</th>
-        <th>Remove</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Object Storage rows here -->
-    </tbody>
-    <tfoot>
-      <!-- We sum "GiBs Stored," "GiBs Retrieved," and the Subtotal. -->
-      <tr>
-        <td colspan="2">Totals</td>
-        <td id="osSumStored">0</td>
-        <td id="osSumRetrieved">0</td>
-        <td id="osSumSubtotal">R$0.00</td>
-        <td></td>
-      </tr>
-    </tfoot>
-  </table>
-
 
   <!-- ************************************************** -->
   <!--              BLOCK STORAGE VOLUMES               -->
   <!-- ************************************************** -->
-  <div class="card">
-    <h2 class="section-title">Add Block Storage Volumes</h2>
+  <div class="resource-section">
+    <h2>Block Storage Volumes</h2>
 
-    <div class="field">
-      <label>Storage Class:</label>
-      <!-- Per request, only "NVMe Standard" is available -->
-      <input type="text" value="NVMe Standard" disabled />
-    </div>
+    <div class="section-form">
+      <div class="field">
+        <label>Storage Class:</label>
+        <input type="text" value="NVMe Standard" disabled />
+      </div>
 
-    <div class="field">
-      <label for="bsIops">IOPS:</label>
-      <select id="bsIops">
-        <option value="1000">1K</option>
-        <option value="5000">5K</option>
-        <option value="10000">10K</option>
-        <option value="15000">15K</option>
-        <option value="20000">20K</option>
-      </select>
-    </div>
+      <div class="field">
+        <label for="bsIops">IOPS:</label>
+        <select id="bsIops">
+          <option value="1000">1K</option>
+          <option value="5000">5K</option>
+          <option value="10000">10K</option>
+          <option value="15000">15K</option>
+          <option value="20000">20K</option>
+        </select>
+        <!-- Unit price note -->
+        <div id="bsUnitPrice" class="price-display"></div>
+      </div>
 
-    <div class="field">
-      <label for="bsVolumeSize">Volume Size (GiB):</label>
-      <input type="number" id="bsVolumeSize" value="250" min="10" max="1024" />
-    </div>
+      <div class="field">
+        <label for="bsVolumeSize">Volume Size (GiB):</label>
+        <input type="number" id="bsVolumeSize" value="250" min="10" max="1024" />
+      </div>
 
-    <div class="field">
-      <label for="bsQuantity">Quantity of Volumes:</label>
-      <input type="number" id="bsQuantity" value="1" min="1" />
+      <div class="field">
+        <label for="bsQuantity">Quantity of Volumes:</label>
+        <input type="number" id="bsQuantity" value="1" min="1" />
+      </div>
     </div>
 
     <button id="addBlockStorageBtn">Add Block Volume</button>
-  </div>
 
-  <!-- Block Storage Table -->
-  <table id="blockStorageTable">
-    <thead>
-      <tr>
-        <th>SKU</th>
-        <th>IOPS</th>
-        <th>Size (GiB)</th>
-        <th>Quantity</th>
-        <th>Subtotal (R$)</th>
-        <th>Remove</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Block Storage rows here -->
-    </tbody>
-    <tfoot>
-      <!-- Summation of IOPS? Possibly not meaningful to sum across different IOPS options,
-           but we'll do it if you want "sum all numeric fields".
-           We'll definitely sum Size, Quantity, and Subtotal. -->
-      <tr>
-        <td>Totals</td>
-        <td id="bsSumIops">0</td>
-        <td id="bsSumSize">0</td>
-        <td id="bsSumQty">0</td>
-        <td id="bsSumSubtotal">R$0.00</td>
-        <td></td>
-      </tr>
-    </tfoot>
-  </table>
+    <!-- Block Storage Table -->
+    <table id="blockStorageTable">
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>IOPS</th>
+          <th>Size (GiB)</th>
+          <th>Quantity</th>
+          <th>Subtotal (R$)</th>
+          <th>Remove</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Block Storage rows here -->
+      </tbody>
+      <tfoot>
+        <tr>
+          <td>Totals</td>
+          <td id="bsSumIops">0</td>
+          <td id="bsSumSize">0</td>
+          <td id="bsSumQty">0</td>
+          <td id="bsSumSubtotal">R$0.00</td>
+          <td></td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
 
   <!-- ************************************************** -->
   <!--                    SUMMARY                         -->
@@ -344,11 +359,10 @@
 
   <script>
     // ---------------------------------------------------------
-    //   1) Data and Utility for Virtual Machines
+    //   1) Data/Utility for Virtual Machines
     // ---------------------------------------------------------
     const memoryRatiosBV = [1, 2, 4];
     const memoryRatiosDP = [2, 4, 8];
-
     const vcpusBV = [1, 2, 4, 8];
     const vcpusDP = [2, 4, 8, 16, 32];
 
@@ -367,7 +381,7 @@
       }
     }
 
-    // Cost formula for VM:
+    // VM cost formula
     // basePrice = 35 for 1 vCPU, memRatio=1, BV, Linux, 0 disk, 0 GPU
     // perfClassFactor = 1 for BV, 1.5 for DP
     // totalComputeCost = basePrice * perfClassFactor * vcpus * memRatio
@@ -392,17 +406,19 @@
       }
 
       let diskCost = (numDiskGiB / 10) * 8;
-
       let gpuCost = 5110 * gpus;
 
       let total = (computeCost + osSurcharge + diskCost + gpuCost) * qty;
       return total;
     }
 
-    // Arrays to hold items
-    let vmList = [];
+    // For "Price per Instance" we compute the cost with quantity=1
+    function calculateVmCostSingle(perfClass, memRatio, vcpus, os, diskSize, gpuCount) {
+      return calculateVmCost(perfClass, memRatio, vcpus, os, diskSize, gpuCount, 1);
+    }
 
-    // DOM references
+    // VM lists & DOM references
+    let vmList = [];
     const vmPerfClassEl = document.getElementById('vmPerfClass');
     const vmOsTypeEl = document.getElementById('vmOsType');
     const vmMemoryRatioEl = document.getElementById('vmMemoryRatio');
@@ -414,13 +430,16 @@
     const addVmBtn = document.getElementById('addVmBtn');
     const vmTableBody = document.querySelector('#vmTable tbody');
 
-    // Footer fields for sums
+    // Footer sums
     const vmSumVcpusEl = document.getElementById('vmSumVcpus');
     const vmSumRamEl = document.getElementById('vmSumRam');
     const vmSumDiskEl = document.getElementById('vmSumDisk');
     const vmSumGpuEl = document.getElementById('vmSumGpu');
     const vmSumQtyEl = document.getElementById('vmSumQty');
     const vmSumSubtotalEl = document.getElementById('vmSumSubtotal');
+
+    // Price per instance display
+    const vmPricePerInstanceEl = document.getElementById('vmPricePerInstance');
 
     function updateVmForm() {
       const perfClassVal = vmPerfClassEl.value;
@@ -473,12 +492,39 @@
       } else {
         vmGpuNoteEl.textContent = '';
       }
+
+      // Also update the "Price per Instance"
+      updateVmPricePerInstance();
+    }
+
+    // Price per instance: recalc whenever inputs change
+    function updateVmPricePerInstance() {
+      const perfClassVal = vmPerfClassEl.value;
+      const osVal = vmOsTypeEl.value;
+      const memRatioVal = vmMemoryRatioEl.value;
+      const vcpusVal = vmVcpusEl.value;
+      const diskVal = vmLocalDiskEl.value;
+      const gpuVal = vmGpuEl.value;
+
+      const singleCost = calculateVmCostSingle(
+        perfClassVal,
+        memRatioVal,
+        vcpusVal,
+        osVal,
+        diskVal,
+        gpuVal
+      );
+      vmPricePerInstanceEl.textContent = 'Price per Instance: R$' + singleCost.toFixed(2);
     }
 
     vmPerfClassEl.addEventListener('change', updateVmForm);
     vmOsTypeEl.addEventListener('change', updateVmForm);
+    vmMemoryRatioEl.addEventListener('change', updateVmPricePerInstance);
+    vmVcpusEl.addEventListener('change', updateVmPricePerInstance);
+    vmLocalDiskEl.addEventListener('change', updateVmPricePerInstance);
+    vmGpuEl.addEventListener('change', updateVmPricePerInstance);
 
-    // On load
+    // Initial load
     updateVmForm();
 
     function addVmItem() {
@@ -613,27 +659,28 @@
       vmSumQtyEl.textContent = sumQty;
       vmSumSubtotalEl.textContent = 'R$' + sumVmCost.toFixed(2);
 
-      // Update summary
       updateSummary();
     }
-
     addVmBtn.addEventListener('click', addVmItem);
 
+
     // ---------------------------------------------------------
-    //   2) Data and Utility for Object Storage
+    //   2) Object Storage
     // ---------------------------------------------------------
     let objectStorageList = [];
-
     const osClassEl = document.getElementById('osClass');
     const osGiBsEl = document.getElementById('osGiBs');
     const osGiBsRetrievedEl = document.getElementById('osGiBsRetrieved');
     const addObjectStorageBtn = document.getElementById('addObjectStorageBtn');
     const objectStorageTableBody = document.querySelector('#objectStorageTable tbody');
 
-    // Footer elements
+    // Footer
     const osSumStoredEl = document.getElementById('osSumStored');
     const osSumRetrievedEl = document.getElementById('osSumRetrieved');
     const osSumSubtotalEl = document.getElementById('osSumSubtotal');
+
+    // Unit price display
+    const osUnitPriceEl = document.getElementById('osUnitPrice');
 
     // Pricing:
     // Standard: 0.10 R$/GB stored, no retrieval cost
@@ -652,17 +699,29 @@
       return cost;
     }
 
+    function showObjectStorageUnitPrice() {
+      const sc = osClassEl.value;
+      if (sc === 'Standard') {
+        osUnitPriceEl.textContent = 'R$0.10 per GiB stored (no retrieval fee)';
+      } else {
+        osUnitPriceEl.textContent = 'R$0.06 per GiB stored, plus R$0.10 per GiB retrieved';
+      }
+    }
+
     // Hide "GiBs Retrieved" if Standard is selected
-    osClassEl.addEventListener('change', () => {
+    function handleOsClassChange() {
       if (osClassEl.value === 'Standard') {
         osGiBsRetrievedEl.value = '0';
         osGiBsRetrievedEl.disabled = true;
       } else {
         osGiBsRetrievedEl.disabled = false;
       }
-    });
-    // Initialize
-    if (osClassEl.value === 'Standard') osGiBsRetrievedEl.disabled = true;
+      showObjectStorageUnitPrice();
+    }
+
+    osClassEl.addEventListener('change', handleOsClassChange);
+    // Init
+    handleOsClassChange();
 
     function addObjectStorageItem() {
       const sc = osClassEl.value;
@@ -754,8 +813,9 @@
 
     addObjectStorageBtn.addEventListener('click', addObjectStorageItem);
 
+
     // ---------------------------------------------------------
-    //   3) Data and Utility for Block Storage Volumes
+    //   3) Block Storage Volumes
     // ---------------------------------------------------------
     let blockStorageList = [];
 
@@ -765,18 +825,12 @@
     const addBlockStorageBtn = document.getElementById('addBlockStorageBtn');
     const blockStorageTableBody = document.querySelector('#blockStorageTable tbody');
 
-    // Footer elements
     const bsSumIopsEl = document.getElementById('bsSumIops');
     const bsSumSizeEl = document.getElementById('bsSumSize');
     const bsSumQtyEl = document.getElementById('bsSumQty');
     const bsSumSubtotalEl = document.getElementById('bsSumSubtotal');
+    const bsUnitPriceEl = document.getElementById('bsUnitPrice');
 
-    // Pricing per GiB depends on IOPS:
-    // 1000 => 0.58
-    // 5000 => 0.65
-    // 10000 => 0.73
-    // 15000 => 0.81
-    // 20000 => 0.89
     function getBlockStoragePrice(iops) {
       const num = parseInt(iops, 10);
       if (num === 1000) return 0.58;
@@ -786,6 +840,17 @@
       if (num === 20000) return 0.89;
       return 0.58; // fallback
     }
+
+    function showBlockStorageUnitPrice() {
+      const currentIops = parseInt(bsIopsEl.value, 10);
+      const unit = getBlockStoragePrice(currentIops);
+      bsUnitPriceEl.textContent = `R$${unit.toFixed(2)} per GiB`;
+    }
+
+    bsIopsEl.addEventListener('change', showBlockStorageUnitPrice);
+
+    // On load, show default
+    showBlockStorageUnitPrice();
 
     function calculateBlockStorageCost(iops, volumeSize, quantity) {
       const costPerGiB = getBlockStoragePrice(iops);
@@ -820,7 +885,7 @@
 
     function renderBlockStorageTable() {
       blockStorageTableBody.innerHTML = '';
-      let sumIops = 0; // Summing IOPS can be questionable, but done per your request
+      let sumIops = 0;
       let sumSize = 0;
       let sumQty = 0;
       let sumCost = 0;
