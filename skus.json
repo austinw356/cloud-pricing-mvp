@@ -61,6 +61,14 @@
     {
       "iops": 10000,
       "pricePerGB": 0.73
+    },
+    {
+      "iops": 15000,
+      "pricePerGB": 0.81
+    },
+    {
+      "iops": 20000,
+      "pricePerGB": 0.89
     }
     // ... more block storage SKUs ...
   ]
