@@ -1,0 +1,67 @@
+{
+  "virtualMachines": [
+    {
+      "perfClass": "BV",
+      "os": "Linux",
+      "vcpus": 1,
+      "memoryRatio": 1,
+      "localDisk": 20,
+      "monthlyBasePrice": 35
+    },
+    {
+      "perfClass": "BV",
+      "os": "Linux",
+      "vcpus": 1,
+      "memoryRatio": 2,
+      "localDisk": 40,
+      "monthlyBasePrice": 50
+    },
+    {
+      "perfClass": "BV",
+      "os": "Windows",
+      "vcpus": 2,
+      "memoryRatio": 2,
+      "localDisk": 40,
+      "monthlyBasePrice": 200
+    },
+    {
+      "perfClass": "DP",
+      "os": "Linux",
+      "vcpus": 2,
+      "memoryRatio": 4,
+      "localDisk": 100,
+      "monthlyBasePrice": 350
+    }
+    // ... more VM SKUs ...
+  ],
+
+  "objectStorage": [
+    {
+      "class": "Standard",
+      "pricePerGB": 0.10,
+      "retrievalCost": 0
+    },
+    {
+      "class": "ColdInstant",
+      "pricePerGB": 0.06,
+      "retrievalCost": 0.10
+    }
+    // ... more object storage SKUs ...
+  ],
+
+  "blockStorage": [
+    {
+      "iops": 1000,
+      "pricePerGB": 0.58
+    },
+    {
+      "iops": 5000,
+      "pricePerGB": 0.65
+    },
+    {
+      "iops": 10000,
+      "pricePerGB": 0.73
+    }
+    // ... more block storage SKUs ...
+  ]
+}
